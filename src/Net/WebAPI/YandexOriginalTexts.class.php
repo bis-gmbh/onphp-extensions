@@ -1,8 +1,12 @@
 <?php
-/***************************************************************************
- *   Copyright (C) 2014 by Barzmann Internet Solutions                     *
- *   Author Dmitry Nezhelskoy <dmitry@nezhelskoy.ru>                       *
- ***************************************************************************/
+/**
+ * Onphp Extensions Package
+ * 
+ * @author Dmitry Nezhelskoy <dmitry@nezhelskoy.pro>
+ * @copyright 2014-2016 Barzmann Internet Solutions GmbH
+ */
+
+namespace Onphp\Extensions\Net\WebAPI;
 
 /**
  * Class YandexOriginalTexts
@@ -37,7 +41,7 @@ final class YandexOriginalTexts extends YandexAPI
 		$headers = array(
 			'GET ' . $path . ' HTTP/1.1',
 			'Host: ' . $host,
-			'Authorization: OAuth ' . $this->token->getAccessToken(),
+			'Authorization: OAuth ' . $this->accessToken,
 		);
 
 		$curlOptions = array(
@@ -82,7 +86,7 @@ final class YandexOriginalTexts extends YandexAPI
 		$headers = array(
 			'POST ' . $path . ' HTTP/1.1',
 			'Host: ' . $host,
-			'Authorization: OAuth ' . $this->token->getAccessToken(),
+			'Authorization: OAuth ' . $this->accessToken,
 			'Content-Length: ' . strlen($text),
 		);
 
@@ -123,7 +127,7 @@ final class YandexOriginalTexts extends YandexAPI
 		$headers = array(
 			'DELETE ' . $path . ' HTTP/1.1',
 			'Host: ' . $host,
-			'Authorization: OAuth ' . $this->token->getAccessToken(),
+			'Authorization: OAuth ' . $this->accessToken,
 		);
 
 		$curlOptions = array(

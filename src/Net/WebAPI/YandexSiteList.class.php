@@ -1,8 +1,12 @@
 <?php
-/***************************************************************************
- *   Copyright (C) 2014 by Barzmann Internet Solutions                     *
- *   Author Dmitry Nezhelskoy <dmitry@nezhelskoy.ru>                       *
- ***************************************************************************/
+/**
+ * Onphp Extensions Package
+ * 
+ * @author Dmitry Nezhelskoy <dmitry@nezhelskoy.pro>
+ * @copyright 2014-2016 Barzmann Internet Solutions GmbH
+ */
+
+namespace Onphp\Extensions\Net\WebAPI;
 
 /**
  * Class YandexSiteList
@@ -31,7 +35,7 @@ final class YandexSiteList extends YandexAPI
 		$headers = array(
 			'GET ' . $path . ' HTTP/1.1',
 			'Host: ' . $host,
-			'Authorization: OAuth ' . $this->token->getAccessToken(),
+			'Authorization: OAuth ' . $this->accessToken,
 		);
 
 		$curlOptions = array(
@@ -51,7 +55,7 @@ final class YandexSiteList extends YandexAPI
 		$info   = curl_getinfo($ch);
 
 		if ($info['http_code'] === 200) {
-			$hostlist = new SimpleXMLElement($result);
+			$hostlist = new \SimpleXMLElement($result);
 			foreach ($hostlist->host as $host) {
 				$state = $host->verification['state']->__toString();
 				if ($state === 'VERIFIED') {

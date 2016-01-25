@@ -1,8 +1,15 @@
 <?php
-/***************************************************************************
- *   Copyright (C) 2014 - 2015 by Barzmann Internet Solutions              *
- *   Author Dmitry Nezhelskoy <dmitry@nezhelskoy.ru>                       *
- ***************************************************************************/
+/**
+ * Onphp Extensions Package
+ * 
+ * @author Dmitry Nezhelskoy <dmitry@nezhelskoy.pro>
+ * @copyright 2014-2016 Barzmann Internet Solutions GmbH
+ */
+
+namespace Onphp\Extensions\Net\WebAPI;
+
+use \Onphp\WrongArgumentException;
+use \Onphp\Assert;
 
 /**
  * Class YandexAPI
@@ -10,42 +17,40 @@
 class YandexAPI
 {
 	/**
-	 * @var TokenStorage|null
+	 * @var string
 	 */
-	protected $token = null;
+	protected $accessToken;
 
 	private static $serviceDocument = '';
 
 	/**
-	 * @param TokenStorage $token
+	 * @param string $accessToken|null
 	 */
-	public function __construct(TokenStorage $token = null)
+	public function __construct($accessToken = null)
 	{
-		if ($token) {
-			$this->setToken($token);
+		if ($accessToken) {
+			$this->setAccessToken($accessToken);
 		}
 	}
 
 	/**
-	 * @param TokenStorage $token
+	 * @param string $accessToken
 	 * @return $this
-	 * @throws WebAPIException
+	 * @throws WrongArgumentException
 	 */
-	public function setToken(TokenStorage $token)
+	public function setAccessToken($accessToken)
 	{
-		$wsType = (int)$token->getWebServiceType()->getId();
-		if ($wsType !== WebServiceType::YA) {
-			throw new WebAPIException('Wrong token type. Expected to ' . WebServiceType::YA . ', but ' . $wsType . ' given.');
-		}
-		$this->token = $token;
+		Assert::isString($accessToken);
+		$this->accessToken = $accessToken;
 		return $this;
 	}
 
-	protected function dropRevokedToken()
-	{
-		TokenStorage::dao()->drop($this->token);
-		$this->token = null;
-	}
+// !!! Need Refactoring !!!
+//	protected function dropRevokedToken()
+//	{
+//		TokenStorage::dao()->drop($this->token);
+//		$this->token = null;
+//	}
 
 	protected function getServiceDocument()
 	{
@@ -54,7 +59,7 @@ class YandexAPI
 			$headers = array(
 				'GET /api/v2 HTTP/1.1',
 				'Host: webmaster.yandex.ru',
-				'Authorization: OAuth ' . $this->token->getAccessToken(),
+				'Authorization: OAuth ' . $this->accessToken,
 			);
 			$curlOptions = array(
 				CURLOPT_URL             => $url,
@@ -71,7 +76,7 @@ class YandexAPI
 			$result = curl_exec($ch);
 			$info   = curl_getinfo($ch);
 			if ($info['http_code'] === 200) {
-				$service = new SimpleXMLElement($result);
+				$service = new \SimpleXMLElement($result);
 				self::$serviceDocument = $service->workspace->collection['href'];
 			}
 		}
