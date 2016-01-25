@@ -6,6 +6,13 @@
  * @copyright 2014-2016 Barzmann Internet Solutions GmbH
  */
 
+namespace Onphp\Extensions\Net\OAuth2;
+use \Facebook\Facebook;
+use \Assert;
+use \WrongArgumentException;
+use \Facebook\Authentication\AccessToken;
+use \Facebook\Exceptions\FacebookSDKException;
+
 /**
  * Class FBAuthenticator
  * 
@@ -55,7 +62,7 @@ class FBAuthenticator implements OAuth2Interface
 		if (session_status() === PHP_SESSION_NONE) {
 			session_start();
 		}
-		$this->fb = new \Facebook\Facebook([
+		$this->fb = new Facebook([
 			'app_id' => $this->appId,
 			'app_secret' => $this->appSecret,
 			'default_graph_version' => self::API_VERSION,
@@ -135,13 +142,13 @@ class FBAuthenticator implements OAuth2Interface
 	{
 		$response = new \StdClass();
 
-		/** @var \Facebook\Authentication\AccessToken|null $accessToken */
+		/** @var AccessToken|null $accessToken */
 		$accessToken = null;
 
 		$helper = $this->fb->getRedirectLoginHelper();
 		try {
 			$accessToken = $helper->getAccessToken();
-		} catch (\Facebook\Exceptions\FacebookSDKException $e) {
+		} catch (FacebookSDKException $e) {
 			// When Graph returns an error or validation fails or other local issues
 			$response->error = $e->getCode();
 			$response->error_description = $e->getMessage();

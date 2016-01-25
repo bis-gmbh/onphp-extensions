@@ -6,6 +6,11 @@
  * @copyright 2014-2016 Barzmann Internet Solutions GmbH
  */
 
+namespace Onphp\Extensions\Net\OAuth2;
+use \Onphp\Extensions\Net\WebAPI\WebAPIException;
+use \Form;
+use \Primitive;
+
 /**
  * Class VKClientAuthStrategy
  */
