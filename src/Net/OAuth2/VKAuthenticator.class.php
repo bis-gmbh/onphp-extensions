@@ -6,11 +6,6 @@
  * @copyright 2014-2016 Barzmann Internet Solutions GmbH
  */
 
-namespace Onphp\Extensions\Net\OAuth2;
-
-use \Onphp\Assert;
-use \Onphp\WrongArgumentException;
-
 /**
  * Class VKAuthenticator
  * 
