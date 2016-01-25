@@ -45,13 +45,6 @@ class YandexAPI
 		return $this;
 	}
 
-// !!! Need Refactoring !!!
-//	protected function dropRevokedToken()
-//	{
-//		TokenStorage::dao()->drop($this->token);
-//		$this->token = null;
-//	}
-
 	protected function getServiceDocument()
 	{
 		if (empty(self::$serviceDocument)) {

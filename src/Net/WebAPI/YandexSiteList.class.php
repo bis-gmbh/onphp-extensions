@@ -78,7 +78,6 @@ final class YandexSiteList extends YandexAPI
 		} elseif (
 			$info['http_code'] === 401/* || $info['http_code'] === 403*/
 		) {
-			$this->dropRevokedToken();
 			return false;
 		}
 
