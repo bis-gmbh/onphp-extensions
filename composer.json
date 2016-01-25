@@ -9,15 +9,10 @@
       "email": "dmitry@nezhelskoy.pro"
     }
   ],
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/bis-gmbh/onphp-extensions"
-    }
-  ],
   "require": {
     "php": ">=5.4.0",
-    "bis-gmbh/onphp": "dev-masterNs"
+    "bis-gmbh/onphp": "dev-masterNs",
+    "facebook/php-sdk-v4" : "~5.0"
   },
   "autoload": {
     "psr-4": {

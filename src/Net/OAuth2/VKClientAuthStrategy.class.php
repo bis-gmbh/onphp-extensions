@@ -1,10 +1,16 @@
 <?php
 /**
- * textreporter.ru (https://textreporter.ru/)
+ * Onphp Extensions Package
  * 
  * @author Dmitry Nezhelskoy <dmitry@nezhelskoy.pro>
- * @copyright 2014-2015 Barzmann Internet Solutions GmbH
+ * @copyright 2014-2016 Barzmann Internet Solutions GmbH
  */
+
+namespace Onphp\Extensions\Net\OAuth2;
+
+use \Onphp\Extensions\Net\WebAPI\WebAPIException;
+use \Onphp\Form;
+use \Onphp\Primitive;
 
 /**
  * Class VKClientAuthStrategy
@@ -62,10 +68,10 @@ class VKClientAuthStrategy implements VKAuthStrategyInterface
 			$form->import($result);
 
 			if ($form->getErrors()) {
-				throw new Exception('Получены некорректные параметры');
+				throw new WebAPIException('Получены некорректные параметры');
 			}
 
-		} catch(Exception $e) {
+		} catch(\Exception $e) {
 			unset($result['access_token']);
 			unset($result['expires_in']);
 

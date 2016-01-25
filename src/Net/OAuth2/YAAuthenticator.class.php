@@ -1,24 +1,40 @@
 <?php
-/***************************************************************************
- *   Copyright (C) 2014 - 2015 by Barzmann Internet Solutions              *
- *   Author Dmitry Nezhelskoy <dmitry@nezhelskoy.ru>                       *
- ***************************************************************************/
+/**
+ * Onphp Extensions Package
+ * 
+ * @author Dmitry Nezhelskoy <dmitry@nezhelskoy.pro>
+ * @copyright 2014-2016 Barzmann Internet Solutions GmbH
+ */
+
+namespace Onphp\Extensions\Net\OAuth2;
+
+use \Onphp\WrongArgumentException;
+use \Onphp\Assert;
 
 /**
  * Class YAAuthenticator
  */
 class YAAuthenticator implements OAuth2Interface
 {
+	private $yandexId;
+
+	private $yandexPassword;
+
 	private $redirectUri = '';
 
 	/**
+	 * $params = [
+	 *     'yandexId'       => 'YANDEX_ID',       // required
+	 *     'yandexPassword' => 'YANDEX_PASSWORD', // required
+	 *     'redirectUri'    => '/auth/endpoint',  // optional
+	 * ];
+	 * 
 	 * @param array $params
 	 */
-	public function __construct(array $params = [])
+	public function __construct(array $params)
 	{
-		if (isset($params['redirectUri'])) {
-			$this->setRedirectUri($params['redirectUri']);
-		}
+		$this->yandexId = $params['yandexId'];
+		$this->yandexPassword = $params['yandexPassword'];
 	}
 
 	/**
@@ -41,7 +57,7 @@ class YAAuthenticator implements OAuth2Interface
 		return
 			'https://oauth.yandex.ru/authorize?'
 				. 'response_type=code'
-				. '&client_id=' . YANDEX_ID;
+				. '&client_id=' . $this->yandexId;
 	}
 
 	/**
@@ -53,8 +69,8 @@ class YAAuthenticator implements OAuth2Interface
 		$url      = 'https://oauth.yandex.ru/token';
 		$postData = 'grant_type=authorization_code'
 			. '&code=' . $code
-			. '&client_id=' . YANDEX_ID
-			. '&client_secret=' . YANDEX_PASSWORD;
+			. '&client_id=' . $this->yandexId
+			. '&client_secret=' . $this->yandexPassword;
 		$headers  = array(
 			'POST /token HTTP/1.1',
 			'Host: oauth.yandex.ru',
@@ -89,23 +105,25 @@ class YAAuthenticator implements OAuth2Interface
 		return null;
 	}
 
-	/**
-	 * @param Member $member
-	 * @return TokenStorage|null
-	 */
-	public static function getExistNotExpiredToken(Member $member)
-	{
-		$token = TokenStorage::dao()->findToken($member, new WebServiceType(WebServiceType::YA));
-		if ($token) {
-			$expiredDays = $token->getExpiresIn()/86400;
-			$days = Date::dayDifference(
-				Timestamp::makeNow(),
-				Timestamp::create($token->getCreated()->toStamp())
-			);
-			if ($days < $expiredDays) {
-				return $token;
-			}
-		}
-		return null;
-	}
+//	/**
+//	 * !!! Need Refactoring, this method must move to TokenStorage DAO !!!
+//	 *
+//	 * @param Member $member
+//	 * @return TokenStorage|null
+//	 */
+//	public static function getExistNotExpiredToken(Member $member)
+//	{
+//		$token = TokenStorage::dao()->findToken($member, new WebServiceType(WebServiceType::YA));
+//		if ($token) {
+//			$expiredDays = $token->getExpiresIn()/86400;
+//			$days = Date::dayDifference(
+//				Timestamp::makeNow(),
+//				Timestamp::create($token->getCreated()->toStamp())
+//			);
+//			if ($days < $expiredDays) {
+//				return $token;
+//			}
+//		}
+//		return null;
+//	}
 }

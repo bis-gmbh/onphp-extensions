@@ -1,14 +1,16 @@
 <?php
 /**
- * textreporter.ru (https://textreporter.ru/)
+ * Onphp Extensions Package
  * 
  * @author Dmitry Nezhelskoy <dmitry@nezhelskoy.pro>
- * @copyright 2014-2015 Barzmann Internet Solutions GmbH
+ * @copyright 2014-2016 Barzmann Internet Solutions GmbH
  */
+
+namespace Onphp\Extensions\Net\WebAPI;
 
 /**
  * Class WebAPIException
  */
-class WebAPIException extends Exception {
+class WebAPIException extends \Exception {
 	
 }

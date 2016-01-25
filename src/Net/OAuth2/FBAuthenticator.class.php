@@ -1,10 +1,18 @@
 <?php
 /**
- * textreporter.ru (https://textreporter.ru/)
+ * Onphp Extensions Package
  * 
  * @author Dmitry Nezhelskoy <dmitry@nezhelskoy.pro>
- * @copyright 2014-2015 Barzmann Internet Solutions GmbH
+ * @copyright 2014-2016 Barzmann Internet Solutions GmbH
  */
+
+namespace Onphp\Extensions\Net\OAuth2;
+
+use \Facebook\Facebook;
+use \Onphp\Assert;
+use \Onphp\WrongArgumentException;
+use \Facebook\Authentication\AccessToken;
+use \Facebook\Exceptions\FacebookSDKException;
 
 /**
  * Class FBAuthenticator
@@ -15,9 +23,9 @@ class FBAuthenticator implements OAuth2Interface
 {
 	const API_VERSION = 'v2.4';
 
-	private $appId = FB_APP_ID;
+	private $appId;
 
-	private $appSecret = FB_APP_SECRET;
+	private $appSecret;
 
 	private $redirectUri = '';
 
@@ -32,10 +40,20 @@ class FBAuthenticator implements OAuth2Interface
 	private $fb = null;
 
 	/**
+	 * $params = [
+	 *     'appId'       => 'FB_APP_ID',       // required
+	 *     'appSecret'   => 'FB_APP_SECRET',   // required
+	 *     'redirectUri' => '/auth/endpoint',  // optional
+	 *     'permissions' => ['publish_pages'], // optional
+	 * ];
+	 * 
 	 * @param array $params
 	 */
-	public function __construct(array $params = [])
+	public function __construct(array $params)
 	{
+		$this->appId = $params['appId'];
+		$this->appSecret = $params['appSecret'];
+
 		if (isset($params['redirectUri'])) {
 			$this->setRedirectUri($params['redirectUri']);
 		}
@@ -45,7 +63,7 @@ class FBAuthenticator implements OAuth2Interface
 		if (session_status() === PHP_SESSION_NONE) {
 			session_start();
 		}
-		$this->fb = new Facebook\Facebook([
+		$this->fb = new Facebook([
 			'app_id' => $this->appId,
 			'app_secret' => $this->appSecret,
 			'default_graph_version' => self::API_VERSION,
@@ -123,15 +141,15 @@ class FBAuthenticator implements OAuth2Interface
 	 */
 	public function getToken($code)
 	{
-		$response = new StdClass();
+		$response = new \StdClass();
 
-		/** @var Facebook\Authentication\AccessToken|null $accessToken */
+		/** @var AccessToken|null $accessToken */
 		$accessToken = null;
 
 		$helper = $this->fb->getRedirectLoginHelper();
 		try {
 			$accessToken = $helper->getAccessToken();
-		} catch (Facebook\Exceptions\FacebookSDKException $e) {
+		} catch (FacebookSDKException $e) {
 			// When Graph returns an error or validation fails or other local issues
 			$response->error = $e->getCode();
 			$response->error_description = $e->getMessage();

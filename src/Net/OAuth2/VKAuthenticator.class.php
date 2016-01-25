@@ -1,10 +1,15 @@
 <?php
 /**
- * textreporter.ru (https://textreporter.ru/)
+ * Onphp Extensions Package
  * 
  * @author Dmitry Nezhelskoy <dmitry@nezhelskoy.pro>
- * @copyright 2014-2015 Barzmann Internet Solutions GmbH
+ * @copyright 2014-2016 Barzmann Internet Solutions GmbH
  */
+
+namespace Onphp\Extensions\Net\OAuth2;
+
+use \Onphp\Assert;
+use \Onphp\WrongArgumentException;
 
 /**
  * Class VKAuthenticator
@@ -17,9 +22,9 @@ class VKAuthenticator implements OAuth2Interface
 
 	const TOKEN_REGEXP = '/^[a-z0-9]{32,255}$/i';
 
-	private $appId = VK_APP_ID;
+	private $appId;
 
-	private $appSecret = VK_APP_SECRET;
+	private $appSecret;
 
 	private $redirectUri = '';
 
@@ -36,10 +41,21 @@ class VKAuthenticator implements OAuth2Interface
 	private $authStrategy = null;
 
 	/**
+	 * $params = [
+	 *     'appId'        => 'VK_APP_ID',      // required
+	 *     'appSecret'    => 'VK_APP_SECRET',  // required
+	 *     'redirectUri'  => '/auth/endpoint', // optional
+	 *     'permissions'  => 'wall',           // optional
+	 *     'sessionState' => '',               // optional
+	 * ];
+	 * 
 	 * @param array $params
 	 */
-	public function __construct(array $params = [])
+	public function __construct(array $params)
 	{
+		$this->appId = $params['appId'];
+		$this->appSecret = $params['appSecret'];
+
 		if (isset($params['redirectUri'])) {
 			$this->setRedirectUri($params['redirectUri']);
 		}
