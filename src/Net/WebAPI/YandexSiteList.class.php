@@ -6,8 +6,6 @@
  * @copyright 2014-2016 Barzmann Internet Solutions GmbH
  */
 
-namespace Onphp\Extensions\Net\WebAPI;
-
 /**
  * Class YandexSiteList
  */
@@ -78,7 +76,6 @@ final class YandexSiteList extends YandexAPI
 		} elseif (
 			$info['http_code'] === 401/* || $info['http_code'] === 403*/
 		) {
-			$this->dropRevokedToken();
 			return false;
 		}
 

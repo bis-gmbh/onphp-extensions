@@ -9,9 +9,26 @@
       "email": "dmitry@nezhelskoy.pro"
     }
   ],
+  "repositories": [
+    {
+      "type": "package",
+      "package": {
+        "name": "bis-gmbh/onphp",
+        "version": "1.0.10.99",
+        "source": {
+          "url": "https://github.com/bis-gmbh/onphp-framework",
+          "type": "git",
+          "reference": "d6eac4e849d722606bb679d32c80194627cf3a87"
+        },
+        "autoload": {
+          "classmap": ["core/", "main/", "meta/"]
+        }
+      }
+    }
+  ],
   "require": {
     "php": ">=5.4.0",
-    "bis-gmbh/onphp": "dev-masterNs",
+    "bis-gmbh/onphp": "1.0.10.99",
     "facebook/php-sdk-v4" : "~5.0"
   },
   "autoload": {

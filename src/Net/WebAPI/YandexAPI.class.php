@@ -6,11 +6,6 @@
  * @copyright 2014-2016 Barzmann Internet Solutions GmbH
  */
 
-namespace Onphp\Extensions\Net\WebAPI;
-
-use \Onphp\WrongArgumentException;
-use \Onphp\Assert;
-
 /**
  * Class YandexAPI
  */
@@ -44,13 +39,6 @@ class YandexAPI
 		$this->accessToken = $accessToken;
 		return $this;
 	}
-
-// !!! Need Refactoring !!!
-//	protected function dropRevokedToken()
-//	{
-//		TokenStorage::dao()->drop($this->token);
-//		$this->token = null;
-//	}
 
 	protected function getServiceDocument()
 	{
