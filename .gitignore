@@ -1,0 +1,20 @@
+# IDE
+.idea
+nbproject
+.buildpath
+.project
+.settings
+
+# OS
+Thumbs.db
+.DS_Store
+
+# composer
+/vendor
+composer.phar
+composer.lock
+
+# phpunit
+phpunit.phar
+/phpunit.xml
+

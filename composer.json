@@ -1,0 +1,27 @@
+{
+  "name": "bis-gmbh/onphp-extensions",
+  "description": "Onphp Extensions Package",
+  "keywords": ["onphp", "extensions"],
+  "license": "BSD-3-Clause",
+  "authors": [
+    {
+      "name": "Dmitry Nezhelskoy",
+      "email": "dmitry@nezhelskoy.pro"
+    }
+  ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/bis-gmbh/onphp-extensions"
+    }
+  ],
+  "require": {
+    "php": ">=5.4.0",
+    "bis-gmbh/onphp": "dev-masterNs"
+  },
+  "autoload": {
+    "psr-4": {
+      "Onphp\\Extensions\\": "src/"
+    }
+  }
+}
