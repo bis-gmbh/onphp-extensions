@@ -103,26 +103,4 @@ class YAAuthenticator implements OAuth2Interface
 		}
 		return null;
 	}
-
-//	/**
-//	 * !!! Need Refactoring, this method must move to TokenStorage DAO !!!
-//	 *
-//	 * @param Member $member
-//	 * @return TokenStorage|null
-//	 */
-//	public static function getExistNotExpiredToken(Member $member)
-//	{
-//		$token = TokenStorage::dao()->findToken($member, new WebServiceType(WebServiceType::YA));
-//		if ($token) {
-//			$expiredDays = $token->getExpiresIn()/86400;
-//			$days = Date::dayDifference(
-//				Timestamp::makeNow(),
-//				Timestamp::create($token->getCreated()->toStamp())
-//			);
-//			if ($days < $expiredDays) {
-//				return $token;
-//			}
-//		}
-//		return null;
-//	}
 }
