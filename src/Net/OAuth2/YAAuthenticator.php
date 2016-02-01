@@ -7,6 +7,8 @@
  */
 
 namespace Onphp\Extensions\Net\OAuth2;
+
+use \Onphp\Extensions\Net\CurlTrait;
 use \WrongArgumentException;
 use \Assert;
 
@@ -15,6 +17,8 @@ use \Assert;
  */
 class YAAuthenticator implements OAuth2Interface
 {
+	use CurlTrait;
+
 	private $yandexId;
 
 	private $yandexPassword;
@@ -90,7 +94,7 @@ class YAAuthenticator implements OAuth2Interface
 			CURLOPT_HTTPHEADER      => $headers
 		);
 		$ch = curl_init();
-		curl_setopt_array($ch, $curlOptions);
+		curl_setopt_array($ch, $this->getCurlOptions($curlOptions));
 		$result = curl_exec($ch);
 		$info   = curl_getinfo($ch);
 		if ($info['http_code'] === 200) {
