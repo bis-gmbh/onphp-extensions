@@ -96,7 +96,7 @@ final class YandexSiteList extends YandexAPI
 			foreach ($siteList as $site) {
 				if (
 					isset($site['name'])
-					&& $site['name'] === $refinedSiteName
+					&& strtolower($site['name']) === $refinedSiteName
 				) {
 					return true;
 				}
@@ -112,11 +112,12 @@ final class YandexSiteList extends YandexAPI
 	 */
 	public static function getSiteIdByName($siteList, $siteName)
 	{
+		$siteName = preg_replace('/^www\./', '', $siteName);
 		if (is_array($siteList)) {
 			foreach ($siteList as $site) {
 				if (
 					isset($site['name'])
-					&& $site['name'] === $siteName
+					&& strtolower($site['name']) === $siteName
 				) {
 					return $site['id'];
 				}
