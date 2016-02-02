@@ -8,15 +8,11 @@
 
 namespace Onphp\Extensions\Net\WebAPI;
 
-use \Onphp\Extensions\Net\CurlTrait;
-
 /**
  * Class YandexOriginalTexts
  */
 final class YandexOriginalTexts extends YandexAPI
 {
-	use CurlTrait;
-
 	const TEXTS_PER_DAY = 100;
 
 	const MIN_LENGTH = 500;

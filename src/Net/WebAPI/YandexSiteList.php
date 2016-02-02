@@ -8,15 +8,11 @@
 
 namespace Onphp\Extensions\Net\WebAPI;
 
-use \Onphp\Extensions\Net\CurlTrait;
-
 /**
  * Class YandexSiteList
  */
 final class YandexSiteList extends YandexAPI
 {
-	use CurlTrait;
-
 	private $siteList = array();
 
 	/**
