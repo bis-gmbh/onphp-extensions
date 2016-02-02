@@ -8,11 +8,15 @@
 
 namespace Onphp\Extensions\Net\WebAPI;
 
+use \Onphp\Extensions\Net\CurlTrait;
+
 /**
  * Class YandexSiteList
  */
 final class YandexSiteList extends YandexAPI
 {
+	use CurlTrait;
+
 	private $siteList = array();
 
 	/**
@@ -40,7 +44,7 @@ final class YandexSiteList extends YandexAPI
 
 		$curlOptions = array(
 			CURLOPT_URL             => $url,
-			CURLOPT_CONNECTTIMEOUT  => 1,
+			CURLOPT_CONNECTTIMEOUT  => 5,
 			CURLOPT_FRESH_CONNECT   => 1,
 			CURLOPT_RETURNTRANSFER  => 1,
 			CURLOPT_FORBID_REUSE    => 1,
@@ -50,7 +54,7 @@ final class YandexSiteList extends YandexAPI
 		);
 
 		$ch = curl_init();
-		curl_setopt_array($ch, $curlOptions);
+		curl_setopt_array($ch, $this->getCurlOptions($curlOptions));
 		$result = curl_exec($ch);
 		$info   = curl_getinfo($ch);
 

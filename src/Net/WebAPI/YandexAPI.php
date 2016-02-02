@@ -9,12 +9,15 @@
 namespace Onphp\Extensions\Net\WebAPI;
 use \WrongArgumentException;
 use \Assert;
+use \Onphp\Extensions\Net\CurlTrait;
 
 /**
  * Class YandexAPI
  */
 class YandexAPI
 {
+	use CurlTrait;
+
 	/**
 	 * @var string
 	 */
@@ -55,7 +58,7 @@ class YandexAPI
 			);
 			$curlOptions = array(
 				CURLOPT_URL             => $url,
-				CURLOPT_CONNECTTIMEOUT  => 1,
+				CURLOPT_CONNECTTIMEOUT  => 5,
 				CURLOPT_FRESH_CONNECT   => 1,
 				CURLOPT_RETURNTRANSFER  => 1,
 				CURLOPT_FORBID_REUSE    => 1,
@@ -64,7 +67,7 @@ class YandexAPI
 				CURLOPT_HTTPHEADER      => $headers,
 			);
 			$ch = curl_init();
-			curl_setopt_array($ch, $curlOptions);
+			curl_setopt_array($ch, $this->getCurlOptions($curlOptions));
 			$result = curl_exec($ch);
 			$info   = curl_getinfo($ch);
 			if ($info['http_code'] === 200) {

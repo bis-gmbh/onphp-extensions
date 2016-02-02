@@ -84,7 +84,7 @@ class YAAuthenticator implements OAuth2Interface
 			CURLOPT_POST            => 1,
 			CURLOPT_HEADER          => 0,
 			CURLOPT_URL             => $url,
-			CURLOPT_CONNECTTIMEOUT  => 1,
+			CURLOPT_CONNECTTIMEOUT  => 5,
 			CURLOPT_FRESH_CONNECT   => 1,
 			CURLOPT_RETURNTRANSFER  => 1,
 			CURLOPT_FORBID_REUSE    => 1,

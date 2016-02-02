@@ -8,11 +8,15 @@
 
 namespace Onphp\Extensions\Net\WebAPI;
 
+use \Onphp\Extensions\Net\CurlTrait;
+
 /**
  * Class YandexOriginalTexts
  */
 final class YandexOriginalTexts extends YandexAPI
 {
+	use CurlTrait;
+
 	const TEXTS_PER_DAY = 100;
 
 	const MIN_LENGTH = 500;
@@ -56,7 +60,7 @@ final class YandexOriginalTexts extends YandexAPI
 		);
 
 		$ch = curl_init();
-		curl_setopt_array($ch, $curlOptions);
+		curl_setopt_array($ch, $this->getCurlOptions($curlOptions));
 		$result = curl_exec($ch);
 		$info   = curl_getinfo($ch);
 
@@ -103,7 +107,7 @@ final class YandexOriginalTexts extends YandexAPI
 		);
 
 		$ch = curl_init();
-		curl_setopt_array($ch, $curlOptions);
+		curl_setopt_array($ch, $this->getCurlOptions($curlOptions));
 		$result = curl_exec($ch);
 		$info   = curl_getinfo($ch);
 
@@ -132,7 +136,7 @@ final class YandexOriginalTexts extends YandexAPI
 
 		$curlOptions = array(
 			CURLOPT_URL             => $url,
-			CURLOPT_CONNECTTIMEOUT  => 1,
+			CURLOPT_CONNECTTIMEOUT  => 5,
 			CURLOPT_FRESH_CONNECT   => 1,
 			CURLOPT_RETURNTRANSFER  => 1,
 			CURLOPT_FORBID_REUSE    => 1,
@@ -143,7 +147,7 @@ final class YandexOriginalTexts extends YandexAPI
 		);
 
 		$ch = curl_init();
-		curl_setopt_array($ch, $curlOptions);
+		curl_setopt_array($ch, $this->getCurlOptions($curlOptions));
 		curl_exec($ch);
 		$info   = curl_getinfo($ch);
 
