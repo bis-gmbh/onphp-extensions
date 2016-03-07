@@ -26,7 +26,7 @@ class DNS
      * @return string
      * @throws \Exception
      */
-    public static function gethostbyaddr($ip, $options)
+    public static function gethostbyaddr($ip, $options = [])
     {
         $defaultDNS = [
             '8.8.8.8',
@@ -39,7 +39,7 @@ class DNS
                 $dns = $options['dns'];
             }
         } else {
-            $dns = $defaultDNS[mt_rand(0, count($options['dns']) - 1)];
+            $dns = $defaultDNS[mt_rand(0, count($defaultDNS) - 1)];
         }
 
         if (isset($options['timeout']) && is_integer($options['timeout'])) {
