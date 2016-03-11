@@ -90,12 +90,26 @@ class DNS
         @fclose($handle);
         if ($response == "")
             return $ip;
-        // find the response type
-        try { // will work only with custom error handler, like in onphp framework (http://stackoverflow.com/a/9104189)
+
+        $error2Exception = function ($errno = 0, $errstr = null, $errfile = null, $errline = null) {
+            // If error is suppressed with @, don't throw an exception
+            if (error_reporting() === 0) {
+                return true; // return true to continue through the others error handlers
+            }
+            throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
+        };
+        $originalErrorHandler = set_error_handler($error2Exception);
+
+        $type = [null, null];
+        try { // will work only with custom error handler (http://stackoverflow.com/a/9104189)
+            // find the response type
             $type = @unpack("s", substr($response, $requestsize+2));
         } catch (\Exception $e) {
             return $ip;
+        } finally {
+            restore_error_handler();
         }
+
         if ($type[1] == 0x0C00)  // answer
         {
             // set up our variables
