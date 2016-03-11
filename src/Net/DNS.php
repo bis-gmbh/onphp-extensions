@@ -91,7 +91,11 @@ class DNS
         if ($response == "")
             return $ip;
         // find the response type
-        $type = @unpack("s", substr($response, $requestsize+2));
+        try { // will work only with custom error handler, like in onphp framework (http://stackoverflow.com/a/9104189)
+            $type = @unpack("s", substr($response, $requestsize+2));
+        } catch (\Exception $e) {
+            return $ip;
+        }
         if ($type[1] == 0x0C00)  // answer
         {
             // set up our variables
