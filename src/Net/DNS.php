@@ -83,7 +83,7 @@ class DNS
         $handle = @fsockopen("udp://$dns", 53);
         // send our request (and store request size so we can cheat later)
         $requestsize=@fwrite($handle, $data);
-    
+
         @socket_set_timeout($handle, $timeout);
         // hope we get a reply
         $response = @fread($handle, 1000);
@@ -105,10 +105,10 @@ class DNS
             // find the response type
             $type = @unpack("s", substr($response, $requestsize+2));
         } catch (\Exception $e) {
-            return $ip;
-        } finally {
             restore_error_handler();
+            return $ip;
         }
+        restore_error_handler();
 
         if ($type[1] == 0x0C00)  // answer
         {
