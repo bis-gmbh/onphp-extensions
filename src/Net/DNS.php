@@ -88,8 +88,9 @@ class DNS
         // hope we get a reply
         $response = @fread($handle, 1000);
         @fclose($handle);
-        if ($response == "")
+        if (empty($response)) {
             return $ip;
+        }
         $rawData = substr($response, $requestsize + 2);
         if ($rawData === false) {
             return $ip;
@@ -100,20 +101,24 @@ class DNS
         if ($type[1] == 0x0C00)  // answer
         {
             // set up our variables
-            $host="";
+            $host = "";
             $len = 0;
             // set our pointer at the beginning of the hostname
             // uses the request size from earlier rather than work it out
-            $position=$requestsize+12;
+            $position = $requestsize + 12;
             // reconstruct hostname
             do
             {
+                $rawSegment = substr($response, $position);
+                if ($rawSegment === false) {
+                    break;
+                }
                 // get segment size
-                $len = unpack("c", substr($response, $position));
+                $len = unpack("c", $rawSegment);
                 // null terminated string, so length 0 = finished
                 if ($len[1] == 0)
                     // return the hostname, without the trailing .
-                    return substr($host, 0, strlen($host) -1);
+                    return substr($host, 0, strlen($host) - 1);
                 // add segment to our host
                 $host .= substr($response, $position+1, $len[1]) . ".";
                 // move pointer on to the next segment
