@@ -16,10 +16,6 @@ class Pbkdf2
 
 	const SALT_ITERATIONS = 10;
 
-	const POMPOUS_SECRET = <<<TOKEN
-vT@sw6b7,MD#orY8iQG%CbHLyzeziWFNWGnew=X]QuFfXtc(vP
-TOKEN;
-
 	/**
 	 * Generate a random salt with plenty of entropy
 	 *
@@ -52,11 +48,9 @@ TOKEN;
 	 * @param int $iterationCount Optional. The number of times to run operation (i.e. > 10000 times)
 	 * @return bool Matches.
 	 */
-	public static function isMatch($password, $hash, $salt,
-		$iterationCount = self::HASH_ITERATIONS
-	)
+	public static function isMatch($password, $hash, $salt, $iterationCount = self::HASH_ITERATIONS, $secret)
 	{
-		$hashExpected = self::hash($password, $salt, $iterationCount);
+		$hashExpected = self::hash($password, $salt, $iterationCount, $secret);
 
 		return $hashExpected === $hash;
 	}
@@ -71,9 +65,8 @@ TOKEN;
 	 * @param string $secret Optional. A secret, known only to the application. This helps to add entropy.
 	 * @return string
 	 */
-	public static function hash($password, $salt, $iterationCount = self::HASH_ITERATIONS,
-		$secret = self::POMPOUS_SECRET
-	) {
+	public static function hash($password, $salt, $iterationCount = self::HASH_ITERATIONS, $secret)
+	{
 		$hash = $password;
 
 		for ($i = 0; $i < $iterationCount; ++$i) {
