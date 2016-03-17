@@ -14,6 +14,9 @@
     "bis-gmbh/onphp": "dev-masterNs",
     "facebook/php-sdk-v4" : "~5.0"
   },
+  "require-dev": {
+        "phpunit/phpunit": "5.2.*"
+  },
   "autoload": {
     "psr-4": {
       "Onphp\\Extensions\\": "src/"
