@@ -73,12 +73,13 @@ final class YandexOriginalTexts extends YandexAPI
 	 * @param string $siteId
 	 * @param string $text
 	 * @return bool
+	 * @throws WebAPIException
 	 */
 	public function add($siteId, $text)
 	{
-		if ( ! self::isValid($text)) {
-			return false;
-		}
+//		if ( ! self::isValid($text)) {
+//			return false;
+//		}
 		$serviceDocument = $this->getServiceDocument();
 		$url     = $serviceDocument . '/' . $siteId . '/original-texts/';
 		$host    = parse_url($serviceDocument, PHP_URL_HOST);
@@ -109,8 +110,27 @@ final class YandexOriginalTexts extends YandexAPI
 
 		if ($info['http_code'] === 201) {
 			return true;
+		} else {
+			/** @see https://tech.yandex.ru/webmaster/doc/dg/reference/errors-docpage/ */
+			$code    = (int)$info['http_code'];
+			$message = 'Unknown error';
+			$dom = new \DOMDocument("1.0", "UTF-8");
+			if ($dom->loadXML($result)) {
+				/** @var \DOMNodeList $errorElems */
+				$errorElems = $dom->getElementsByTagName('error');
+				if (isset($errorElems[0])) {
+					/** @var \DOMElement $errorElem */
+					$errorElem = $errorElems[0];
+					$message = $errorElem->getAttribute('code');
+					$messageElems = $errorElem->getElementsByTagName('message');
+					if (isset($messageElems[0])) {
+						$messageElem = $messageElems[0];
+						$message .= ': "' . $messageElem->nodeValue . '"';
+					}
+				}
+			}
+			throw new WebAPIException($message, $code);
 		}
-		return false;
 	}
 
 	/**
