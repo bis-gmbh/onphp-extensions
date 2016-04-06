@@ -118,13 +118,15 @@ final class YandexOriginalTexts extends YandexAPI
 			if ($dom->loadXML($result)) {
 				/** @var \DOMNodeList $errorElems */
 				$errorElems = $dom->getElementsByTagName('error');
-				if (isset($errorElems[0])) {
-					/** @var \DOMElement $errorElem */
-					$errorElem = $errorElems[0];
+				/** @var \DOMElement $errorElem */
+				$errorElem = $errorElems->item(0);
+				if ($errorElem) {
 					$message = $errorElem->getAttribute('code');
+					/** @var \DOMNodeList $messageElems */
 					$messageElems = $errorElem->getElementsByTagName('message');
-					if (isset($messageElems[0])) {
-						$messageElem = $messageElems[0];
+					/** @var \DOMElement $messageElem */
+					$messageElem = $messageElems->item(0);
+					if ($messageElem) {
 						$message .= ': "' . $messageElem->nodeValue . '"';
 					}
 				}
