@@ -115,21 +115,25 @@ final class YandexOriginalTexts extends YandexAPI
 			$code    = (int)$info['http_code'];
 			$message = 'Unknown error';
 			$dom = new \DOMDocument("1.0", "UTF-8");
-			if ($dom->loadXML($result)) {
-				/** @var \DOMNodeList $errorElems */
-				$errorElems = $dom->getElementsByTagName('error');
-				/** @var \DOMElement $errorElem */
-				$errorElem = $errorElems->item(0);
-				if ($errorElem) {
-					$message = $errorElem->getAttribute('code');
-					/** @var \DOMNodeList $messageElems */
-					$messageElems = $errorElem->getElementsByTagName('message');
-					/** @var \DOMElement $messageElem */
-					$messageElem = $messageElems->item(0);
-					if ($messageElem) {
-						$message .= ': "' . $messageElem->nodeValue . '"';
+			try {
+				if ($dom->loadXML($result)) {
+					/** @var \DOMNodeList $errorElems */
+					$errorElems = $dom->getElementsByTagName('error');
+					/** @var \DOMElement $errorElem */
+					$errorElem = $errorElems->item(0);
+					if ($errorElem) {
+						$message = $errorElem->getAttribute('code');
+						/** @var \DOMNodeList $messageElems */
+						$messageElems = $errorElem->getElementsByTagName('message');
+						/** @var \DOMElement $messageElem */
+						$messageElem = $messageElems->item(0);
+						if ($messageElem) {
+							$message .= ': "' . $messageElem->nodeValue . '"';
+						}
 					}
 				}
+			} catch (\Exception $e) {
+				$message = $e->getMessage() . PHP_EOL . print_r($info, true);
 			}
 			throw new WebAPIException($message, $code);
 		}
