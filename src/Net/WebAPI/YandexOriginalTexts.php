@@ -135,9 +135,7 @@ final class YandexOriginalTexts extends YandexAPI
 			} catch (\Exception $e) {
 				$message = $e->getMessage() . PHP_EOL
 					. PHP_EOL . 'Request headers:' . PHP_EOL . print_r($headers, true) . PHP_EOL
-					. PHP_EOL . 'Request body:' . PHP_EOL . print_r($text, true) . PHP_EOL
-					. PHP_EOL . 'curl_exec() result:' . PHP_EOL . print_r($result, true) . PHP_EOL
-					. PHP_EOL . 'curl_getinfo() result:' . PHP_EOL . print_r($info, true);
+					. PHP_EOL . 'Response info:' . PHP_EOL . print_r($info, true);
 			}
 			throw new WebAPIException($message, $code);
 		}
