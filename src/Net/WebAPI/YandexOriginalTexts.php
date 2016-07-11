@@ -88,7 +88,7 @@ final class YandexOriginalTexts extends YandexAPI
 			'POST ' . $path . ' HTTP/1.1',
 			'Host: ' . $host,
 			'Authorization: OAuth ' . $this->accessToken,
-			'Content-Length: ' . strlen($text),
+			'Content-Length: ' . mb_strlen($text),
 		);
 
 		$curlOptions = array(
