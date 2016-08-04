@@ -86,8 +86,8 @@ class DNS
         }
 
         $type = @unpack("s", $rawData);
-        if (in_array($type[1], [0x0C00, 0x0600])) {
-            // TODO: handle type 0x0500, as 72.52.91.14 -> php-web2.php.net
+        if ($type[1] == 0x0C00) {
+            // TODO: check case 72.52.91.14 -> php-web2.php.net
             $host = '';
             $position = $requestsize + 12;
             do {
