@@ -8,6 +8,8 @@
 
 namespace Onphp\Extensions\Net;
 
+use \Onphp\WrongArgumentException;
+
 /**
  * Class DNS
  */
@@ -25,6 +27,7 @@ class DNS
      * ]
      * @return string
      * @throws \Exception
+     * @throws WrongArgumentException
      */
     public static function gethostbyaddr($ip, $options = [])
     {
@@ -32,6 +35,12 @@ class DNS
             '8.8.8.8',
             '8.8.4.4',
         ];
+
+        $long = ip2long($ip);
+        if ($long === false) {
+            throw new WrongArgumentException(sprintf('wrong ip given %s', $ip));
+        }
+
         if (isset($options['dns'])) {
             if (is_array($options['dns'])) {
                 $dns = $options['dns'][mt_rand(0, count($options['dns']) - 1)];
@@ -48,67 +57,40 @@ class DNS
             $timeout = 3;
         }
 
-        // random transaction number (for routers etc to get the reply back)
-        $data = rand(0, 99);
-        // trim it to 2 bytes
-        $data = substr($data, 0, 2);
-        // request header
+        // http://www.ietf.org/rfc/rfc1035.txt 4.1.1. Header section format
+        $data = pack("n", mt_rand(0, 0xFFFF));
         $data .= "\1\0\0\1\0\0\0\0\0\0";
-        // split IP up
-        $bits = explode(".", $ip);
-        // error checking
-        if (count($bits) != 4) return "ERROR";
-        // there is probably a better way to do this bit...
-        // loop through each segment
-        for ($x=3; $x>=0; $x--)
-        {
-            // needs a byte to indicate the length of each segment of the request
-            switch (strlen($bits[$x]))
-            {
-                case 1: // 1 byte long segment
-                    $data .= "\1"; break;
-                case 2: // 2 byte long segment
-                    $data .= "\2"; break;
-                case 3: // 3 byte long segment
-                    $data .= "\3"; break;
-                default: // segment is too big, invalid IP
-                    return "INVALID";
-            }
-            // and the segment itself
-            $data .= $bits[$x];
-        }
-        // and the final bit of the request
-        $data .= "\7in-addr\4arpa\0\0\x0C\0\1";
-        // create UDP socket
-        $handle = @fsockopen("udp://$dns", 53);
-        // send our request (and store request size so we can cheat later)
-        $requestsize=@fwrite($handle, $data);
 
-        @socket_set_timeout($handle, $timeout);
-        // hope we get a reply
-        $response = @fread($handle, 1000);
-        @fclose($handle);
-        if (empty($response)) {
-            return $ip;
-        }
+        $octet1 = $long & 0xFF;
+        $octet2 = $long >> 8 & 0xFF;
+        $octet3 = $long >> 16 & 0xFF;
+        $octet4 = $long >> 24 & 0xFF;
+        $data .= pack(
+            "Ca*Ca*Ca*Ca*",
+            strlen($octet1), $octet1,
+            strlen($octet2), $octet2,
+            strlen($octet3), $octet3,
+            strlen($octet4), $octet4
+        );
+        $data .= "\7in-addr\4arpa\0\0\x0C\0\1";
+
+        $handle = fsockopen("udp://$dns", 53);
+        stream_set_timeout($handle, $timeout);
+        $requestsize = fwrite($handle, $data);
+        $response = fread($handle, 1000);
+        fclose($handle);
+
         $rawData = substr($response, $requestsize + 2);
         if ($rawData === false) {
             return $ip;
         }
-        // find the response type
-        $type = @unpack("s", $rawData);
 
-        if ($type[1] == 0x0C00)  // answer
-        {
-            // set up our variables
-            $host = "";
-            $len = 0;
-            // set our pointer at the beginning of the hostname
-            // uses the request size from earlier rather than work it out
+        $type = unpack("s", $rawData);
+        if (in_array($type[1], [0x0C00, 0x0600])) {
+            // TODO: handle type 0x0500, as 72.52.91.14 -> php-web2.php.net
+            $host = '';
             $position = $requestsize + 12;
-            // reconstruct hostname
-            do
-            {
+            do {
                 $rawSegment = substr($response, $position);
                 if ($rawSegment === false) {
                     break;
@@ -116,18 +98,17 @@ class DNS
                 // get segment size
                 $len = unpack("c", $rawSegment);
                 // null terminated string, so length 0 = finished
-                if ($len[1] == 0)
+                if ($len[1] == 0) {
                     // return the hostname, without the trailing .
                     return substr($host, 0, strlen($host) - 1);
-                // add segment to our host
-                $host .= substr($response, $position+1, $len[1]) . ".";
-                // move pointer on to the next segment
+                }
+                $host .= substr($response, $position + 1, $len[1]) . ".";
                 $position += $len[1] + 1;
-            }
-            while ($len != 0);
-            // error - return the hostname we constructed (without the . on the end)
+            } while ($len != 0);
+
             return $ip;
         }
+
         return $ip;
     }
 }
