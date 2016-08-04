@@ -85,7 +85,7 @@ class DNS
             return $ip;
         }
 
-        $type = unpack("s", $rawData);
+        $type = @unpack("s", $rawData);
         if (in_array($type[1], [0x0C00, 0x0600])) {
             // TODO: handle type 0x0500, as 72.52.91.14 -> php-web2.php.net
             $host = '';
