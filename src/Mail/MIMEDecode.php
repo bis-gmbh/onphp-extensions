@@ -457,7 +457,7 @@ class MIMEDecode
      * @return array Contains parsed result
      * @access private
      */
-    function _parseHeaderValue($input)
+    private function _parseHeaderValue($input)
     {
 
         if (($pos = strpos($input, ';')) === false) {
