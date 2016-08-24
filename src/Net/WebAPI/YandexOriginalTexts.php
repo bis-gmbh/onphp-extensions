@@ -73,12 +73,13 @@ final class YandexOriginalTexts extends YandexAPI
 	 * @param string $siteId
 	 * @param string $text
 	 * @return bool
+	 * @throws WebAPIException
 	 */
 	public function add($siteId, $text)
 	{
-		if ( ! self::isValid($text)) {
-			return false;
-		}
+//		if ( ! self::isValid($text)) {
+//			return false;
+//		}
 		$serviceDocument = $this->getServiceDocument();
 		$url     = $serviceDocument . '/' . $siteId . '/original-texts/';
 		$host    = parse_url($serviceDocument, PHP_URL_HOST);
@@ -87,7 +88,7 @@ final class YandexOriginalTexts extends YandexAPI
 			'POST ' . $path . ' HTTP/1.1',
 			'Host: ' . $host,
 			'Authorization: OAuth ' . $this->accessToken,
-			'Content-Length: ' . strlen($text),
+			'Content-Length: ' . mb_strlen($text),
 		);
 
 		$curlOptions = array(
@@ -109,8 +110,35 @@ final class YandexOriginalTexts extends YandexAPI
 
 		if ($info['http_code'] === 201) {
 			return true;
+		} else {
+			/** @see https://tech.yandex.ru/webmaster/doc/dg/reference/errors-docpage/ */
+			$code    = (int)$info['http_code'];
+			$message = 'Unknown error';
+			$dom = new \DOMDocument("1.0", "UTF-8");
+			try {
+				if ($dom->loadXML($result)) {
+					/** @var \DOMNodeList $errorElems */
+					$errorElems = $dom->getElementsByTagName('error');
+					/** @var \DOMElement $errorElem */
+					$errorElem = $errorElems->item(0);
+					if ($errorElem) {
+						$message = $errorElem->getAttribute('code');
+						/** @var \DOMNodeList $messageElems */
+						$messageElems = $errorElem->getElementsByTagName('message');
+						/** @var \DOMElement $messageElem */
+						$messageElem = $messageElems->item(0);
+						if ($messageElem) {
+							$message .= ': "' . $messageElem->nodeValue . '"';
+						}
+					}
+				}
+			} catch (\Exception $e) {
+				$message = $e->getMessage() . PHP_EOL
+					. PHP_EOL . 'Request headers:' . PHP_EOL . print_r($headers, true) . PHP_EOL
+					. PHP_EOL . 'Response info:' . PHP_EOL . print_r($info, true);
+			}
+			throw new WebAPIException($message, $code);
 		}
-		return false;
 	}
 
 	/**
