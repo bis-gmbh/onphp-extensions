@@ -20,7 +20,7 @@ use \Facebook\Exceptions\FacebookSDKException;
  */
 class FBAuthenticator implements OAuth2Interface
 {
-	const API_VERSION = 'v2.4';
+	const API_VERSION = 'v2.7';
 
 	private $appId;
 
@@ -66,6 +66,7 @@ class FBAuthenticator implements OAuth2Interface
 			'app_id' => $this->appId,
 			'app_secret' => $this->appSecret,
 			'default_graph_version' => self::API_VERSION,
+			'persistent_data_handler' => 'session',
 		]);
 	}
 
