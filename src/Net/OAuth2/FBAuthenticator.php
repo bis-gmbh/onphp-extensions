@@ -157,8 +157,14 @@ class FBAuthenticator implements OAuth2Interface
 		}
 		if (isset($accessToken)) {
 			// Logged in!
-			$response->access_token = $accessToken->getValue();
-			$response->expires_in = $accessToken->getExpiresAt()->getTimestamp();
+			$expiresAt = $accessToken->getExpiresAt();
+			if ($expiresAt instanceof \DateTime) {
+				$response->access_token = $accessToken->getValue();
+				$response->expires_in = $expiresAt->getTimestamp();
+			} else {
+				$response->error = 0;
+				$response->error_description = 'Expiration date was not originally provided';
+			}
 			return $response;
 		} else if ($helper->getError()) {
 			// The user denied the request
