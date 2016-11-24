@@ -23,7 +23,7 @@ class YandexAPI
 	 */
 	protected $accessToken;
 
-	private static $clientId = '';
+	private $clientId = '';
 
 	/**
 	 * @param string $accessToken|null
@@ -49,7 +49,7 @@ class YandexAPI
 
 	public function getClientId()
 	{
-		if (empty(self::$clientId)) {
+		if (empty($this->clientId)) {
 			$url     = 'https://api.webmaster.yandex.net/v3/user/';
 
 			$headers = array(
@@ -73,11 +73,11 @@ class YandexAPI
 			
 			if ($info['http_code'] === 200) {
 				if ( ($data = json_decode($result, true)) && !empty($data['user_id']) ) {
-					self::$clientId = $data['user_id'];
+					$this->clientId = $data['user_id'];
 				}
 			}
 		}
 		
-		return self::$clientId;
+		return $this->clientId;
 	}
 }
