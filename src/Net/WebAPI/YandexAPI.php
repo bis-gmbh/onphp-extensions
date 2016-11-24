@@ -23,7 +23,7 @@ class YandexAPI
 	 */
 	protected $accessToken;
 
-	private static $serviceDocument = '';
+	private static $clientId = '';
 
 	/**
 	 * @param string $accessToken|null
@@ -47,15 +47,15 @@ class YandexAPI
 		return $this;
 	}
 
-	protected function getServiceDocument()
+	public function getClientId()
 	{
-		if (empty(self::$serviceDocument)) {
-			$url     = 'https://webmaster.yandex.ru/api/v2';
+		if (empty(self::$clientId)) {
+			$url     = 'https://api.webmaster.yandex.net/v3/user/';
+
 			$headers = array(
-				'GET /api/v2 HTTP/1.1',
-				'Host: webmaster.yandex.ru',
 				'Authorization: OAuth ' . $this->accessToken,
 			);
+			
 			$curlOptions = array(
 				CURLOPT_URL             => $url,
 				CURLOPT_CONNECTTIMEOUT  => 5,
@@ -70,11 +70,14 @@ class YandexAPI
 			curl_setopt_array($ch, $this->getCurlOptions($curlOptions));
 			$result = curl_exec($ch);
 			$info   = curl_getinfo($ch);
+			
 			if ($info['http_code'] === 200) {
-				$service = new \SimpleXMLElement($result);
-				self::$serviceDocument = $service->workspace->collection['href'];
+				if ( ($data = json_decode($result, true)) && !empty($data['user_id']) ) {
+					self::$clientId = $data['user_id'];
+				}
 			}
 		}
-		return self::$serviceDocument;
+		
+		return self::$clientId;
 	}
 }

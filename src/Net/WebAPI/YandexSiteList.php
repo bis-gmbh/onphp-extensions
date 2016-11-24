@@ -28,13 +28,10 @@ final class YandexSiteList extends YandexAPI
 	 */
 	public function getSiteList()
 	{
-		$serviceDocument = $this->getServiceDocument();
-		$url     = $serviceDocument;
-		$host    = parse_url($serviceDocument, PHP_URL_HOST);
-		$path    = parse_url($serviceDocument, PHP_URL_PATH);
+		$clientId = $this->getClientId();
+		$url     = 'https://api.webmaster.yandex.net/v3/user/' . $clientId . '/hosts/';
+
 		$headers = array(
-			'GET ' . $path . ' HTTP/1.1',
-			'Host: ' . $host,
 			'Authorization: OAuth ' . $this->accessToken,
 		);
 
@@ -54,24 +51,27 @@ final class YandexSiteList extends YandexAPI
 		$result = curl_exec($ch);
 		$info   = curl_getinfo($ch);
 
-		if ($info['http_code'] === 200) {
-			$hostlist = new \SimpleXMLElement($result);
-			foreach ($hostlist->host as $host) {
-				$state = $host->verification['state']->__toString();
-				if ($state === 'VERIFIED') {
-					$href     = $host['href']->__toString();
-					$path     = parse_url($href, PHP_URL_PATH);
-					$pathPart = explode('/', $path);
-					if (parse_url($host->name->__toString(), PHP_URL_SCHEME)) {
-						$name = parse_url($host->name->__toString(), PHP_URL_HOST);
+		if (
+			$info['http_code'] === 200
+			&& ($data = json_decode($result, true))
+			&& (array_key_exists('hosts', $data))
+		) {
+			foreach ($data['hosts'] as $host) {
+				if ($host['verified']) {
+					$href = $host['unicode_host_url'];
+
+					if (parse_url($href, PHP_URL_SCHEME)) {
+						$name = parse_url($href, PHP_URL_HOST);
 					} else {
-						$name = $host->name->__toString();
+						$name = $href;
 					}
+					
 					$refinedName = preg_replace('/^www\./', '', $name);
+					
 					$this->siteList[]  = array(
 						'href' => $href,
 						'name' => $refinedName,
-						'id'   => array_pop($pathPart),
+						'id'   => $host['host_id'],
 					);
 				}
 			}

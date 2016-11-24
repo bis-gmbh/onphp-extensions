@@ -34,10 +34,12 @@ final class YandexOriginalTexts extends YandexAPI
 	 */
 	public function getList($siteId)
 	{
-		$serviceDocument = $this->getServiceDocument();
-		$url     = $serviceDocument . '/' . $siteId . '/original-texts/';
+		$clientId = $this->getClientId();
+		$url     = 'https://api.webmaster.yandex.net/v3/user/' . $clientId . '/hosts/' . $siteId . '/original-texts/';
+
 		$host    = parse_url($url, PHP_URL_HOST);
 		$path    = parse_url($url, PHP_URL_PATH);
+		
 		$headers = array(
 			'GET ' . $path . ' HTTP/1.1',
 			'Host: ' . $host,
@@ -80,27 +82,32 @@ final class YandexOriginalTexts extends YandexAPI
 //		if ( ! self::isValid($text)) {
 //			return false;
 //		}
-		$serviceDocument = $this->getServiceDocument();
-		$url     = $serviceDocument . '/' . $siteId . '/original-texts/';
-		$host    = parse_url($serviceDocument, PHP_URL_HOST);
-		$path    = parse_url($serviceDocument, PHP_URL_PATH);
+		$clientId = $this->getClientId();
+		$url     = 'https://api.webmaster.yandex.net/v3/user/' . $clientId . '/hosts/' . $siteId . '/original-texts/';
+
 		$headers = array(
-			'POST ' . $path . ' HTTP/1.1',
-			'Host: ' . $host,
 			'Authorization: OAuth ' . $this->accessToken,
-			'Content-Length: ' . mb_strlen($text),
+			'Content-Type: application/json',
+		);
+
+		$postData = json_encode(
+			array(
+				'content' => $text,
+			),
+			JSON_UNESCAPED_UNICODE
 		);
 
 		$curlOptions = array(
-			CURLOPT_URL             => $url,
-			CURLOPT_CONNECTTIMEOUT  => 10,
-			CURLOPT_FRESH_CONNECT   => 1,
-			CURLOPT_RETURNTRANSFER  => 1,
-			CURLOPT_FORBID_REUSE    => 1,
-			CURLOPT_TIMEOUT         => 5,
-			CURLOPT_SSL_VERIFYPEER  => false,
-			CURLOPT_HTTPHEADER      => $headers,
-			CURLOPT_POSTFIELDS      => $text,
+			CURLOPT_URL				 => $url,
+			CURLOPT_CONNECTTIMEOUT	 => 10,
+			CURLOPT_FRESH_CONNECT	 => 1,
+			CURLOPT_RETURNTRANSFER	 => 1,
+			CURLOPT_FORBID_REUSE	 => 1,
+			CURLOPT_TIMEOUT			 => 5,
+			CURLOPT_SSL_VERIFYPEER	 => false,
+			CURLOPT_HTTPHEADER		 => $headers,
+			CURLOPT_POST			 => 1,
+			CURLOPT_POSTFIELDS		 => $postData,
 		);
 
 		$ch = curl_init();
@@ -114,29 +121,19 @@ final class YandexOriginalTexts extends YandexAPI
 			/** @see https://tech.yandex.ru/webmaster/doc/dg/reference/errors-docpage/ */
 			$code    = (int)$info['http_code'];
 			$message = 'Unknown error';
-			$dom = new \DOMDocument("1.0", "UTF-8");
-			try {
-				if ($dom->loadXML($result)) {
-					/** @var \DOMNodeList $errorElems */
-					$errorElems = $dom->getElementsByTagName('error');
-					/** @var \DOMElement $errorElem */
-					$errorElem = $errorElems->item(0);
-					if ($errorElem) {
-						$message = $errorElem->getAttribute('code');
-						/** @var \DOMNodeList $messageElems */
-						$messageElems = $errorElem->getElementsByTagName('message');
-						/** @var \DOMElement $messageElem */
-						$messageElem = $messageElems->item(0);
-						if ($messageElem) {
-							$message .= ': "' . $messageElem->nodeValue . '"';
-						}
-					}
+
+			if ( 
+				($data = json_decode($result, true))
+				&& array_key_exists('error_code', $data)
+				&& array_key_exists('error_message', $data)
+			) {
+				if ($data['error_code'] == 'TEXT_ALREADY_ADDED') {
+					return true;
 				}
-			} catch (\Exception $e) {
-				$message = $e->getMessage() . PHP_EOL
-					. PHP_EOL . 'Request headers:' . PHP_EOL . print_r($headers, true) . PHP_EOL
-					. PHP_EOL . 'Response info:' . PHP_EOL . print_r($info, true);
+				
+				$message = $data['error_code'] . ': ' . $data['error_message'];
 			}
+			
 			throw new WebAPIException($message, $code);
 		}
 	}
@@ -144,17 +141,16 @@ final class YandexOriginalTexts extends YandexAPI
 	/**
 	 * Docs https://tech.yandex.ru/webmaster/doc/dg/reference/host-original-texts-delete-docpage/
 	 * 
-	 * @param string $href Адрес операции original-texts определяется ссылкой вида <link href=" ... " rel="original-texts"/>, содержащейся в ответе сервиса на запрос информации о сайте
+	 * @param string $siteId
+	 * @param string $textId
 	 * @return bool
 	 */
-	public function delete($href)
+	public function delete($siteId, $textId)
 	{
-		$url     = $href;
-		$host    = parse_url($url, PHP_URL_HOST);
-		$path    = parse_url($url, PHP_URL_PATH);
+		$clientId = $this->getClientId();
+		$url     = 'https://api.webmaster.yandex.net/v3/user/' . $clientId . '/hosts/' . $siteId . '/original-texts/' . $textId . '/';
+
 		$headers = array(
-			'DELETE ' . $path . ' HTTP/1.1',
-			'Host: ' . $host,
 			'Authorization: OAuth ' . $this->accessToken,
 		);
 
@@ -203,10 +199,9 @@ final class YandexOriginalTexts extends YandexAPI
 	 */
 	public static function prepare($text)
 	{
+		$text = html_entity_decode($text);
 		$text = strip_tags($text);
-		$text = htmlspecialchars($text);
-		$text = '<original-text><content>' . $text . '</content></original-text>';
-		$text = urlencode($text);
+
 		return $text;
 	}
 }
