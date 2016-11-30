@@ -7,6 +7,7 @@
  */
 
 namespace Onphp\Extensions\Net\OAuth2;
+
 use \Facebook\Facebook;
 use \Assert;
 use \WrongArgumentException;

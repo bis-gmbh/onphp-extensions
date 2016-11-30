@@ -7,6 +7,7 @@
  */
 
 namespace Onphp\Extensions\Net\WebAPI;
+
 use \WrongArgumentException;
 use \Assert;
 use \Onphp\Extensions\Net\CurlTrait;
@@ -55,7 +56,7 @@ class YandexAPI
 			$headers = array(
 				'Authorization: OAuth ' . $this->accessToken,
 			);
-			
+
 			$curlOptions = array(
 				CURLOPT_URL             => $url,
 				CURLOPT_CONNECTTIMEOUT  => 5,
@@ -70,14 +71,14 @@ class YandexAPI
 			curl_setopt_array($ch, $this->getCurlOptions($curlOptions));
 			$result = curl_exec($ch);
 			$info   = curl_getinfo($ch);
-			
+
 			if ($info['http_code'] === 200) {
 				if ( ($data = json_decode($result, true)) && !empty($data['user_id']) ) {
 					$this->clientId = $data['user_id'];
 				}
 			}
 		}
-		
+
 		return $this->clientId;
 	}
 }

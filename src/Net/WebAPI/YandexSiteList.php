@@ -65,9 +65,9 @@ final class YandexSiteList extends YandexAPI
 					} else {
 						$name = $href;
 					}
-					
+
 					$refinedName = preg_replace('/^www\./', '', $name);
-					
+
 					$this->siteList[]  = array(
 						'href' => $href,
 						'name' => $refinedName,

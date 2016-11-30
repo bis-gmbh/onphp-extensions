@@ -7,6 +7,7 @@
  */
 
 namespace Onphp\Extensions\Net\OAuth2;
+
 use \Onphp\Extensions\Net\WebAPI\WebAPIException;
 use \Form;
 use \Primitive;

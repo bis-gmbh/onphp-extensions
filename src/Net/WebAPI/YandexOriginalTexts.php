@@ -39,7 +39,7 @@ final class YandexOriginalTexts extends YandexAPI
 
 		$host    = parse_url($url, PHP_URL_HOST);
 		$path    = parse_url($url, PHP_URL_PATH);
-		
+
 		$headers = array(
 			'GET ' . $path . ' HTTP/1.1',
 			'Host: ' . $host,
@@ -130,10 +130,10 @@ final class YandexOriginalTexts extends YandexAPI
 				if ($data['error_code'] == 'TEXT_ALREADY_ADDED') {
 					return true;
 				}
-				
+
 				$message = $data['error_code'] . ': ' . $data['error_message'];
 			}
-			
+
 			throw new WebAPIException($message, $code);
 		}
 	}
