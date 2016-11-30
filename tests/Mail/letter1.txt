@@ -1,0 +1,52 @@
+Delivered-To: mailbox@example.net
+Received: by 10.157.11.142 with SMTP id 14csp1502291oth; Mon, 22 Aug 2016
+ 05:49:01 -0700 (PDT)
+X-Received: by 10.98.149.22 with SMTP id p22mr42194010pfd.88.1471870140978;
+ Mon, 22 Aug 2016 05:49:00 -0700 (PDT)
+Return-Path: <jose-211-21435701.Ljg5ajIuY29t-85-1-913-210-jodi@lula.rsf7.com>
+Received: from lula.rsf7.com ([198.16.34.145]) by mx.google.com with ESMTP id
+ x76si22698087pfd.200.2016.08.22.05.49.00 for <mailbox@example.net>; Mon, 22
+ Aug 2016 05:49:00 -0700 (PDT)
+Received-SPF: pass (google.com: domain of
+ jose-211-21435701.ljg5ajiuy29t-85-1-913-210-jodi@lula.rsf7.com designates
+ 198.16.34.145 as permitted sender) client-ip=198.16.34.145;
+Authentication-Results: mx.google.com; dkim=fail header.i=@lula.rsf7.com;
+ spf=pass (google.com: domain of
+ jose-211-21435701.ljg5ajiuy29t-85-1-913-210-jodi@lula.rsf7.com designates
+ 198.16.34.145 as permitted sender)
+ smtp.mailfrom=jose-211-21435701.Ljg5ajIuY29t-85-1-913-210-jodi@lula.rsf7.com
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed/relaxed; s=default;
+ d=lula.rsf7.com;
+ h=Date:From:To:Subject:MIME-Version:Message-ID:Content-Type:Content-Transfer-Encoding;
+ i=jodi@lula.rsf7.com; bh=QJvRD+uKurI3KPRhml1eAXmdwxY=;
+ b=QBFBlYXefNHO1yo53zX++G7Y3suC/bt/JBG3ccA8qetgUE9GC9+JYMjwoJhXYKYIz6Tq3dAoft7A
+ 3FsIFVPz5aPAHIgPU7YBC8DYVikNKdCKg+Wx0vH/4QfxuURqU4iqccCd2YTCo/6rtQkTmytr1L+h
+ /n5Y4v2ScSbyO5TgLmE=
+DomainKey-Signature: a=rsa-sha1; c=nofws; q=dns; s=default; d=lula.rsf7.com;
+ b=QIbPsVP8q2VCQeiAi1VXiEDg6pZlu6HaYDi7dJeXDWTVh0H1C+HEsFonxfwfOTAuxcxnyIQmeJOD
+ wXSIHSN5rEWBiWgLXhMGoqI5ju0fS2flAHlffB9QhFox4KSKEwhTB+EGABttfU39UafOzrP8/Bvd
+ pYnoroKtLUGAL34mVkQ=;
+Date: Mon, 22 Aug 2016 08:47:43 -0400
+From: "SPAM" <jodi@lula.rsf7.com>
+To: "mailbox" <mailbox@example.net>
+Subject: 
+Return-Path: <jose-211-21435701.Ljg5ajIuY29t-85-1-913-210-@lula.rsf7.com>
+MIME-Version: 1.0
+Message-ID: <ced43df00b11423f36b2862f9ebd7e45@lula.rsf7.com>
+X-Mailer: Fmail 1.8[en]
+X-Mailer-LID: 238
+X-Mailer-RecptId: 21435701
+X-Mailer-SID: 210
+X-Mailer-Sent-By: 1
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>SPAM</title>
+</head>
+<body>
+SPAM BODY
+</body>
+</html>
