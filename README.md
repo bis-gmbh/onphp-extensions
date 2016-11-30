@@ -13,3 +13,16 @@ In `composer.json` add:
 ```
  and run `composer install`.
  
+### Running tests
+
+Setup phpunit config for local environment:
+
+```
+cp phpunit.dist.xml phpunit.xml
+```
+
+edit `phpunit.xml` if needed and run tests:
+
+```
+vendor/bin/phpunit
+```
