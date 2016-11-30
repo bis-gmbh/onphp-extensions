@@ -8,11 +8,15 @@
 
 namespace Onphp\Extensions\Net\OAuth2;
 
+use \Onphp\Extensions\Net\CurlTrait;
+
 /**
  * Class VKServerAuthStrategy
  */
 class VKServerAuthStrategy implements VKAuthStrategyInterface
 {
+	use CurlTrait;
+
 	/**
 	 * @param VKAuthenticator $authObj
 	 * @return string
@@ -44,7 +48,7 @@ class VKServerAuthStrategy implements VKAuthStrategyInterface
 		$curlOptions = [
 			CURLOPT_HEADER          => 0,
 			CURLOPT_URL             => $url,
-			CURLOPT_CONNECTTIMEOUT  => 1,
+			CURLOPT_CONNECTTIMEOUT  => 5,
 			CURLOPT_FRESH_CONNECT   => 1,
 			CURLOPT_RETURNTRANSFER  => 1,
 			CURLOPT_FORBID_REUSE    => 1,
@@ -52,7 +56,7 @@ class VKServerAuthStrategy implements VKAuthStrategyInterface
 			CURLOPT_SSL_VERIFYPEER  => false,
 		];
 		$ch = curl_init();
-		curl_setopt_array($ch, $curlOptions);
+		curl_setopt_array($ch, $this->getCurlOptions($curlOptions));
 		$result = curl_exec($ch);
 		$info   = curl_getinfo($ch);
 		if ($info['http_code'] === 200) {

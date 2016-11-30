@@ -21,7 +21,7 @@ use \Facebook\Exceptions\FacebookSDKException;
  */
 class FBAuthenticator implements OAuth2Interface
 {
-	const API_VERSION = 'v2.4';
+	const API_VERSION = 'v2.7';
 
 	private $appId;
 
@@ -67,6 +67,7 @@ class FBAuthenticator implements OAuth2Interface
 			'app_id' => $this->appId,
 			'app_secret' => $this->appSecret,
 			'default_graph_version' => self::API_VERSION,
+			'persistent_data_handler' => 'session',
 		]);
 	}
 
@@ -157,8 +158,14 @@ class FBAuthenticator implements OAuth2Interface
 		}
 		if (isset($accessToken)) {
 			// Logged in!
-			$response->access_token = $accessToken->getValue();
-			$response->expires_in = $accessToken->getExpiresAt()->getTimestamp();
+			$expiresAt = $accessToken->getExpiresAt();
+			if ($expiresAt instanceof \DateTime) {
+				$response->access_token = $accessToken->getValue();
+				$response->expires_in = $expiresAt->getTimestamp();
+			} else {
+				$response->error = 0;
+				$response->error_description = 'Expiration date was not originally provided';
+			}
 			return $response;
 		} else if ($helper->getError()) {
 			// The user denied the request

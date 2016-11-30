@@ -28,19 +28,16 @@ final class YandexSiteList extends YandexAPI
 	 */
 	public function getSiteList()
 	{
-		$serviceDocument = $this->getServiceDocument();
-		$url     = $serviceDocument;
-		$host    = parse_url($serviceDocument, PHP_URL_HOST);
-		$path    = parse_url($serviceDocument, PHP_URL_PATH);
+		$clientId = $this->getClientId();
+		$url     = 'https://api.webmaster.yandex.net/v3/user/' . $clientId . '/hosts/';
+
 		$headers = array(
-			'GET ' . $path . ' HTTP/1.1',
-			'Host: ' . $host,
 			'Authorization: OAuth ' . $this->accessToken,
 		);
 
 		$curlOptions = array(
 			CURLOPT_URL             => $url,
-			CURLOPT_CONNECTTIMEOUT  => 1,
+			CURLOPT_CONNECTTIMEOUT  => 5,
 			CURLOPT_FRESH_CONNECT   => 1,
 			CURLOPT_RETURNTRANSFER  => 1,
 			CURLOPT_FORBID_REUSE    => 1,
@@ -50,28 +47,31 @@ final class YandexSiteList extends YandexAPI
 		);
 
 		$ch = curl_init();
-		curl_setopt_array($ch, $curlOptions);
+		curl_setopt_array($ch, $this->getCurlOptions($curlOptions));
 		$result = curl_exec($ch);
 		$info   = curl_getinfo($ch);
 
-		if ($info['http_code'] === 200) {
-			$hostlist = new \SimpleXMLElement($result);
-			foreach ($hostlist->host as $host) {
-				$state = $host->verification['state']->__toString();
-				if ($state === 'VERIFIED') {
-					$href     = $host['href']->__toString();
-					$path     = parse_url($href, PHP_URL_PATH);
-					$pathPart = explode('/', $path);
-					if (parse_url($host->name->__toString(), PHP_URL_SCHEME)) {
-						$name = parse_url($host->name->__toString(), PHP_URL_HOST);
+		if (
+			$info['http_code'] === 200
+			&& ($data = json_decode($result, true))
+			&& (array_key_exists('hosts', $data))
+		) {
+			foreach ($data['hosts'] as $host) {
+				if ($host['verified']) {
+					$href = $host['unicode_host_url'];
+
+					if (parse_url($href, PHP_URL_SCHEME)) {
+						$name = parse_url($href, PHP_URL_HOST);
 					} else {
-						$name = $host->name->__toString();
+						$name = $href;
 					}
+
 					$refinedName = preg_replace('/^www\./', '', $name);
+
 					$this->siteList[]  = array(
 						'href' => $href,
 						'name' => $refinedName,
-						'id'   => array_pop($pathPart),
+						'id'   => $host['host_id'],
 					);
 				}
 			}
@@ -112,12 +112,12 @@ final class YandexSiteList extends YandexAPI
 	 */
 	public static function getSiteIdByName($siteList, $siteName)
 	{
-		$refinedSiteName = preg_replace('/^www\./', '', $siteName);
+		$siteName = preg_replace('/^www\./', '', $siteName);
 		if (is_array($siteList)) {
 			foreach ($siteList as $site) {
 				if (
 					isset($site['name'])
-					&& strtolower($site['name']) === $refinedSiteName
+					&& strtolower($site['name']) === $siteName
 				) {
 					return $site['id'];
 				}

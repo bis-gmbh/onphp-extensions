@@ -10,18 +10,21 @@ namespace Onphp\Extensions\Net\WebAPI;
 
 use \Onphp\WrongArgumentException;
 use \Onphp\Assert;
+use \Onphp\Extensions\Net\CurlTrait;
 
 /**
  * Class YandexAPI
  */
 class YandexAPI
 {
+	use CurlTrait;
+
 	/**
 	 * @var string
 	 */
 	protected $accessToken;
 
-	private static $serviceDocument = '';
+	private $clientId = '';
 
 	/**
 	 * @param string $accessToken|null
@@ -45,18 +48,18 @@ class YandexAPI
 		return $this;
 	}
 
-	protected function getServiceDocument()
+	public function getClientId()
 	{
-		if (empty(self::$serviceDocument)) {
-			$url     = 'https://webmaster.yandex.ru/api/v2';
+		if (empty($this->clientId)) {
+			$url     = 'https://api.webmaster.yandex.net/v3/user/';
+
 			$headers = array(
-				'GET /api/v2 HTTP/1.1',
-				'Host: webmaster.yandex.ru',
 				'Authorization: OAuth ' . $this->accessToken,
 			);
+
 			$curlOptions = array(
 				CURLOPT_URL             => $url,
-				CURLOPT_CONNECTTIMEOUT  => 1,
+				CURLOPT_CONNECTTIMEOUT  => 5,
 				CURLOPT_FRESH_CONNECT   => 1,
 				CURLOPT_RETURNTRANSFER  => 1,
 				CURLOPT_FORBID_REUSE    => 1,
@@ -65,14 +68,17 @@ class YandexAPI
 				CURLOPT_HTTPHEADER      => $headers,
 			);
 			$ch = curl_init();
-			curl_setopt_array($ch, $curlOptions);
+			curl_setopt_array($ch, $this->getCurlOptions($curlOptions));
 			$result = curl_exec($ch);
 			$info   = curl_getinfo($ch);
+
 			if ($info['http_code'] === 200) {
-				$service = new \SimpleXMLElement($result);
-				self::$serviceDocument = $service->workspace->collection['href'];
+				if ( ($data = json_decode($result, true)) && !empty($data['user_id']) ) {
+					$this->clientId = $data['user_id'];
+				}
 			}
 		}
-		return self::$serviceDocument;
+
+		return $this->clientId;
 	}
 }
