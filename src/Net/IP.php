@@ -34,15 +34,76 @@ class IP
         }
         list($ipAddr, $maskBits) = explode('/', $cidr);
 
-        $ip   = ip2long($ipAddr);
+        $longRange = self::getLongRangeByCIDR(ip2long($ipAddr), $maskBits);
+
+        return [
+            long2ip($longRange[0]),
+            long2ip($longRange[1])
+        ];
+    }
+
+    /**
+     * @param integer $long
+     * @param integer $maskBits
+     * @return integer[]
+     */
+    public static function getLongRangeByCIDR($long, $maskBits)
+    {
         $mask = ~((1 << (32 - $maskBits)) - 1);
 
-        $network   = $ip & $mask;
+        $network   = $long & $mask;
         $broadcast = $network + ~$mask;
 
         return [
-            long2ip($network),
-            long2ip($broadcast)
+            $network,
+            $broadcast
         ];
+    }
+
+    /**
+     * Example:
+     * 
+     * $start  = '192.168.0.0';
+     * $finish = '192.168.0.255';
+     * $return = '192.168.0.0/24';
+     * 
+     * @param string $start
+     * @param string $finish
+     * @return string|bool
+     */
+    public static function getCIDRByRange($start, $finish)
+    {
+        $numberOfBits = function($x) {
+            if ($x == 0) {
+                return 0;
+            }
+            $n = 1;
+            while ($x != 1) {
+                $x >>= 1;
+                $n++;
+            }
+            return $n;
+        };
+        $maskBits = function($n) use ($numberOfBits) {
+            return 32 - $numberOfBits($n);
+        };
+
+        $x = ip2long($start);
+        $y = ip2long($finish);
+
+        if ($x === false || $y === false || $x > $y) {
+            return false;
+        }
+
+        $nb = $maskBits($y - $x);
+
+        $r1 = self::getLongRangeByCIDR($x, $nb);
+        $r2 = self::getLongRangeByCIDR($y, $nb);
+
+        if ($r1[0] == $r2[0] && $r1[1] == $r2[1]) { // calculated cidr include range
+            return sprintf("%s/%d", long2ip($r1[0]), $nb);
+        }
+
+        return false;
     }
 }
