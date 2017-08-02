@@ -92,7 +92,7 @@ class DNS
             $position = $requestsize + 12;
             do {
                 $rawSegment = substr($response, $position);
-                if ($rawSegment === false) {
+                if (empty($rawSegment)) {
                     break;
                 }
                 // get segment size
