@@ -12,48 +12,48 @@ class IPUtilsTest extends PHPUnit_Framework_TestCase
 {
     public function testIsLong()
     {
-        $this->assertEquals(IPUtils::isLong(null), false);
-        $this->assertEquals(IPUtils::isLong(false), false);
-        $this->assertEquals(IPUtils::isLong(true), false);
-        $this->assertEquals(IPUtils::isLong('127.0.0.1'), false);
-        $this->assertEquals(IPUtils::isLong(-1), false);
-        $this->assertEquals(IPUtils::isLong(4294967296), false);
-        $this->assertEquals(IPUtils::isLong(0), true);
-        $this->assertEquals(IPUtils::isLong(2130706433), true);
+        $this->assertFalse(IPUtils::isLong(null));
+        $this->assertFalse(IPUtils::isLong(false));
+        $this->assertFalse(IPUtils::isLong(true));
+        $this->assertFalse(IPUtils::isLong('127.0.0.1'));
+        $this->assertFalse(IPUtils::isLong(-1));
+        $this->assertFalse(IPUtils::isLong(4294967296));
+        $this->assertTrue(IPUtils::isLong(0));
+        $this->assertTrue(IPUtils::isLong(2130706433));
     }
 
     public function testIsString()
     {
-        $this->assertEquals(IPUtils::isString(null), false);
-        $this->assertEquals(IPUtils::isString(''), false);
-        $this->assertEquals(IPUtils::isString('300'), false);
-        $this->assertEquals(IPUtils::isString('127.0.256.1'), false);
-        $this->assertEquals(IPUtils::isString('0.0.0.0'), true);
-        $this->assertEquals(IPUtils::isString('127.0.0.1'), true);
-        $this->assertEquals(IPUtils::isString('10.0.100.1'), true);
-        $this->assertEquals(IPUtils::isString('224.1.0.0'), true);
-        $this->assertEquals(IPUtils::isString('255.255.255.255'), true);
-        $this->assertEquals(IPUtils::isString('169.255.255'), true);
-        $this->assertEquals(IPUtils::isString('169.255'), true);
-        $this->assertEquals(IPUtils::isString('169'), true);
+        $this->assertFalse(IPUtils::isString(null));
+        $this->assertFalse(IPUtils::isString(''));
+        $this->assertFalse(IPUtils::isString('300'));
+        $this->assertFalse(IPUtils::isString('127.0.256.1'));
+        $this->assertTrue(IPUtils::isString('0.0.0.0'));
+        $this->assertTrue(IPUtils::isString('127.0.0.1'));
+        $this->assertTrue(IPUtils::isString('10.0.100.1'));
+        $this->assertTrue(IPUtils::isString('224.1.0.0'));
+        $this->assertTrue(IPUtils::isString('255.255.255.255'));
+        $this->assertTrue(IPUtils::isString('169.255.255'));
+        $this->assertTrue(IPUtils::isString('169.255'));
+        $this->assertTrue(IPUtils::isString('169'));
     }
 
     public function testIsCIDR()
     {
-        $this->assertEquals(IPUtils::isCIDR(null), false);
-        $this->assertEquals(IPUtils::isCIDR(''), false);
-        $this->assertEquals(IPUtils::isCIDR('/'), false);
-        $this->assertEquals(IPUtils::isCIDR('127.0.0.1'), false);
-        $this->assertEquals(IPUtils::isCIDR('0.0.400.0/0'), false);
-        $this->assertEquals(IPUtils::isCIDR('127.0.0.1/33'), false);
-        $this->assertEquals(IPUtils::isCIDR('192.168.100.2/'), false);
-        $this->assertEquals(IPUtils::isCIDR('/30'), false);
-        $this->assertEquals(IPUtils::isCIDR('0.0.0.0/0'), true);
-        $this->assertEquals(IPUtils::isCIDR('192.168.100.2/30'), true);
-        $this->assertEquals(IPUtils::isCIDR('192.168.100/24'), true);
-        $this->assertEquals(IPUtils::isCIDR('192.168/16'), true);
-        $this->assertEquals(IPUtils::isCIDR('10/8'), true);
-        $this->assertEquals(IPUtils::isCIDR('255.255.255.255/32'), true);
+        $this->assertFalse(IPUtils::isCIDR(null));
+        $this->assertFalse(IPUtils::isCIDR(''));
+        $this->assertFalse(IPUtils::isCIDR('/'));
+        $this->assertFalse(IPUtils::isCIDR('127.0.0.1'));
+        $this->assertFalse(IPUtils::isCIDR('0.0.400.0/0'));
+        $this->assertFalse(IPUtils::isCIDR('127.0.0.1/33'));
+        $this->assertFalse(IPUtils::isCIDR('192.168.100.2/'));
+        $this->assertFalse(IPUtils::isCIDR('/30'));
+        $this->assertTrue(IPUtils::isCIDR('0.0.0.0/0'));
+        $this->assertTrue(IPUtils::isCIDR('192.168.100.2/30'));
+        $this->assertTrue(IPUtils::isCIDR('192.168.100/24'));
+        $this->assertTrue(IPUtils::isCIDR('192.168/16'));
+        $this->assertTrue(IPUtils::isCIDR('10/8'));
+        $this->assertTrue(IPUtils::isCIDR('255.255.255.255/32'));
     }
 
     public function testDetectFormat()
