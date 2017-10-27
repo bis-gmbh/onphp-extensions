@@ -177,12 +177,12 @@ class Utils
         return implode('.', $octets);
     }
 
-    public static function toBinaryString(int $nMask): string
+    public static function toBinaryString(int $addr): string
     {
-        if ($nMask < 0 || $nMask > 4294967295) {
-            throw new \OutOfRangeException('Argument $nMask must be between 0 and 4294967295');
+        if ($addr < 0 || $addr > 0xFFFFFFFF) {
+            throw new \OutOfRangeException('Argument $nMask must be between 0 and 0xFFFFFFFF');
         }
 
-        return str_pad(decbin($nMask), 32, '0', STR_PAD_LEFT);
+        return str_pad(decbin($addr), 32, '0', STR_PAD_LEFT);
     }
 }
