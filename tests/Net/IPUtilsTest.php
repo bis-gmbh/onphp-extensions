@@ -78,7 +78,10 @@ class IPUtilsTest extends PHPUnit_Framework_TestCase
 
     public function testGetMaskBitsFromCIDR()
     {
-        $this->assertEquals(IPUtils::getMaskBitsFromCIDR('127.0.0.1/8'), 16777215);
+        $this->assertEquals(IPUtils::getMaskBitsFromCIDR('127.0.0.1/0'), 0);
+        $this->assertEquals(IPUtils::getMaskBitsFromCIDR('127.0.0.1/8'), 0xFF000000);
+        $this->assertEquals(IPUtils::getMaskBitsFromCIDR('127.0.0.1/24'), 0xFFFFFF00);
+        $this->assertEquals(IPUtils::getMaskBitsFromCIDR('127.0.0.1/32'), 0xFFFFFFFF);
 
         $this->expectException('InvalidArgumentException');
         $this->assertEquals(IPUtils::getMaskBitsFromCIDR('127.0.0.1'), 8);

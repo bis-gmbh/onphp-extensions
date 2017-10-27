@@ -131,14 +131,11 @@ class Utils
             throw new \InvalidArgumentException('Wrong cidr format');
         }
 
-        $mask = 0xFFFFFFFF;
         $cidrParts = explode('/', $cidr);
 
-        for ($i=0; $i<$cidrParts[1]; $i++) {
-            $mask >>= 1;
-        }
+        $mask = 0xFFFFFFFF << (32 - $cidrParts[1]);
 
-        return $mask;
+        return (PHP_INT_SIZE == 8 ? $mask & 0x00000000FFFFFFFF : $mask);
     }
 
     public static function toLong(string $addr): int
