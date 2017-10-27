@@ -86,7 +86,9 @@ class IPUtilsTest extends PHPUnit_Framework_TestCase
 
     public function testToLong()
     {
+        $this->assertEquals(IPUtils::toLong('0.0.0.0'), 0);
         $this->assertEquals(IPUtils::toLong('127.0.0.1'), 2130706433);
+        $this->assertEquals(IPUtils::toLong('255.255.255.255'), 4294967295);
 
         $this->expectException('InvalidArgumentException');
         $this->assertEquals(IPUtils::toLong(''), 0);
