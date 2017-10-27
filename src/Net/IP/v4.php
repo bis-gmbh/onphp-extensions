@@ -13,7 +13,7 @@ class v4 implements Address
     const VERSION = 4;
 
     private $addr = 0;
-    private $mask = 0;
+    private $mask = 0xFFFFFFFF;
 
     public function __construct($anyFormat = null, $mask = null)
     {
@@ -65,6 +65,7 @@ class v4 implements Address
         return $this->mask;
     }
 
+    // TODO: rename method to 'negativeMask'
     public function reverseMasc(): int
     {
         return (PHP_INT_SIZE == 8 ? (~$this->mask) & 0x00000000FFFFFFFF : ~$this->mask);
@@ -140,6 +141,7 @@ class v4 implements Address
         return 'Public';
     }
 
+    // TODO: $scope - array of Address objects
     public function match($scope): bool
     {
         if (is_array($scope)) {

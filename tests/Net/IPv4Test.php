@@ -37,7 +37,7 @@ class IPv4Test extends PHPUnit_Framework_TestCase
 
     public function testNetmask()
     {
-        $this->assertEquals(IPv4::create(0)->netmask(), 0);
+        $this->assertEquals(IPv4::create(0)->netmask(), 0xFFFFFFFF);
         $this->assertEquals(IPv4::create('0.0.0.0', '255.255.255.255')->netmask(), 0xFFFFFFFF);
         $this->assertEquals(IPv4::create('0.0.0.0', '0.0.0.0')->netmask(), 0);
         $this->assertEquals(IPv4::create('0', '255.255.255.0')->netmask(), 0xFFFFFF00);
@@ -52,7 +52,7 @@ class IPv4Test extends PHPUnit_Framework_TestCase
 
     public function testReverseMask()
     {
-        $this->assertEquals(IPv4::create(0)->reverseMasc(), 0xFFFFFFFF);
+        $this->assertEquals(IPv4::create(0)->reverseMasc(), 0);
         $this->assertEquals(IPv4::create('0.0.0.0', '255.255.255.255')->reverseMasc(), 0);
         $this->assertEquals(IPv4::create('0.0.0.0', '0.0.0.0')->reverseMasc(), 0xFFFFFFFF);
         $this->assertEquals(IPv4::create('0', '255.255.255.0')->reverseMasc(), 0x000000FF);
@@ -66,7 +66,7 @@ class IPv4Test extends PHPUnit_Framework_TestCase
 
     public function testMaskBits()
     {
-        $this->assertEquals(IPv4::create(0)->maskBits(), 0);
+        $this->assertEquals(IPv4::create(0)->maskBits(), 32);
         $this->assertEquals(IPv4::create('0.0.0.0', '255.255.255.255')->maskBits(), 32);
         $this->assertEquals(IPv4::create('0.0.0.0', '0.0.0.0')->maskBits(), 0);
         $this->assertEquals(IPv4::create('0', '255.255.255.0')->maskBits(), 24);
@@ -116,7 +116,7 @@ class IPv4Test extends PHPUnit_Framework_TestCase
 
     public function testHostBits()
     {
-        $this->assertEquals(IPv4::create(0)->hostBits(), 32);
+        $this->assertEquals(IPv4::create(0)->hostBits(), 0);
         $this->assertEquals(IPv4::create('255.255.255.255', '255.255.255.255')->hostBits(), 0);
         $this->assertEquals(IPv4::create('192.168/16')->hostBits(), 16);
         $this->assertEquals(IPv4::create('192.168.100.15/30')->hostBits(), 2);
@@ -125,7 +125,7 @@ class IPv4Test extends PHPUnit_Framework_TestCase
 
     public function testCidr()
     {
-        $this->assertEquals(IPv4::create(0)->cidr(), '0.0.0.0/0');
+        $this->assertEquals(IPv4::create(0)->cidr(), '0.0.0.0/32');
         $this->assertEquals(IPv4::create('255.255.255.255', '255.255.255.255')->cidr(), '255.255.255.255/32');
         $this->assertEquals(IPv4::create('192.168/16')->cidr(), '192.168.0.0/16');
         $this->assertEquals(IPv4::create('192.168.100.15', '255.255.255.252')->cidr(), '192.168.100.15/30');
@@ -151,12 +151,13 @@ class IPv4Test extends PHPUnit_Framework_TestCase
 
     public function testNetClass()
     {
-        $this->assertEquals(IPv4::create()->netClass(), '-');
+        $this->assertEquals(IPv4::create()->netClass(), 'C');
         $this->assertEquals(IPv4::create('192.168/16')->netClass(), 'E');
         $this->assertEquals(IPv4::create('192.169/16')->netClass(), 'B');
         $this->assertEquals(IPv4::create('127/8')->netClass(), 'A');
         $this->assertEquals(IPv4::create('224/4')->netClass(), 'D');
         $this->assertEquals(IPv4::create('95.126.18.4/24')->netClass(), 'C');
+        $this->assertEquals(IPv4::create('1.2.3.4/4')->netClass(), '-');
     }
 
     public function testMatch()
