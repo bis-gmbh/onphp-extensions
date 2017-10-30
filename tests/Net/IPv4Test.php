@@ -7,7 +7,6 @@
  */
 
 use \Onphp\Extensions\Net\IP\v4 as IPv4;
-use \Onphp\Extensions\Net\IP\Utils;
 
 class IPv4Test extends PHPUnit_Framework_TestCase
 {
@@ -50,7 +49,7 @@ class IPv4Test extends PHPUnit_Framework_TestCase
         $this->assertEquals(IPv4::create('0.0.0.0', '255.0.13.187')->netmask(), 0xFF000DBB);
     }
 
-    public function testReverseMask()
+    public function testNegativeMask()
     {
         $this->assertEquals(IPv4::create(0)->negativeMask(), 0);
         $this->assertEquals(IPv4::create('0.0.0.0', '255.255.255.255')->negativeMask(), 0);
@@ -64,7 +63,7 @@ class IPv4Test extends PHPUnit_Framework_TestCase
         $this->assertEquals(IPv4::create('0.0.0.0', '255.0.13.187')->negativeMask(), 0x00FFF244);
     }
 
-    public function testMaskBits()
+    public function testPrefixLength()
     {
         $this->assertEquals(IPv4::create(0)->prefixLength(), 32);
         $this->assertEquals(IPv4::create('0.0.0.0', '255.255.255.255')->prefixLength(), 32);
@@ -78,22 +77,22 @@ class IPv4Test extends PHPUnit_Framework_TestCase
         $this->assertEquals(IPv4::create('0.0.0.0', '255.0.13.187')->prefixLength(), 17);
     }
 
-    public function testNetwork()
+    public function testFirst()
     {
-        $this->assertEquals(IPv4::create('0/0')->network(), 0);
-        $this->assertEquals(IPv4::create('255.255.255.255/32')->network(), 0xFFFFFFFF);
-        $this->assertEquals(IPv4::create('192.168/16')->network(), 3232235520); // 192.168.0.0
-        $this->assertEquals(IPv4::create('192.168.100.15/30')->network(), 3232261132); // 192.168.100.12
-        $this->assertEquals(IPv4::create('192.168.100.15/4')->network(), 3221225472); // 192.0.0.0
+        $this->assertEquals(IPv4::create('0/0')->first()->numeric(), 0);
+        $this->assertEquals(IPv4::create('255.255.255.255/32')->first()->numeric(), 0xFFFFFFFF);
+        $this->assertEquals(IPv4::create('192.168/16')->first()->numeric(), 3232235520); // 192.168.0.0
+        $this->assertEquals(IPv4::create('192.168.100.15/30')->first()->numeric(), 3232261132); // 192.168.100.12
+        $this->assertEquals(IPv4::create('192.168.100.15/4')->first()->numeric(), 3221225472); // 192.0.0.0
     }
 
-    public function testBroadcast()
+    public function testLast()
     {
-        $this->assertEquals(IPv4::create('0/0')->broadcast(), 0xFFFFFFFF);
-        $this->assertEquals(IPv4::create('255.255.255.255/32')->broadcast(), 0xFFFFFFFF);
-        $this->assertEquals(IPv4::create('192.168/16')->broadcast(), 3232301055); // 192.168.255.255
-        $this->assertEquals(IPv4::create('192.168.100.15/30')->broadcast(), 3232261135); // 192.168.100.15
-        $this->assertEquals(IPv4::create('192.168.100.15/4')->broadcast(), 3489660927); // 207.255.255.255
+        $this->assertEquals(IPv4::create('0/0')->last()->numeric(), 0xFFFFFFFF);
+        $this->assertEquals(IPv4::create('255.255.255.255/32')->last()->numeric(), 0xFFFFFFFF);
+        $this->assertEquals(IPv4::create('192.168/16')->last()->numeric(), 3232301055); // 192.168.255.255
+        $this->assertEquals(IPv4::create('192.168.100.15/30')->last()->numeric(), 3232261135); // 192.168.100.15
+        $this->assertEquals(IPv4::create('192.168.100.15/4')->last()->numeric(), 3489660927); // 207.255.255.255
     }
 
     public function testNumAddrs()
@@ -121,6 +120,24 @@ class IPv4Test extends PHPUnit_Framework_TestCase
         $this->assertEquals(IPv4::create('192.168/16')->hostBits(), 16);
         $this->assertEquals(IPv4::create('192.168.100.15/30')->hostBits(), 2);
         $this->assertEquals(IPv4::create('10/8')->hostBits(), 24);
+    }
+
+    public function testAddr()
+    {
+        $this->assertEquals(IPv4::create(0)->addr(), '0.0.0.0');
+        $this->assertEquals(IPv4::create('255.255.255.255', '255.255.255.255')->addr(), '255.255.255.255');
+        $this->assertEquals(IPv4::create('192.168/16')->addr(), '192.168.0.0');
+        $this->assertEquals(IPv4::create('192.168.100.15', '255.255.255.252')->addr(), '192.168.100.15');
+        $this->assertEquals(IPv4::create('10/8')->addr(), '10.0.0.0');
+    }
+
+    public function testMask()
+    {
+        $this->assertEquals(IPv4::create(0)->mask(), '255.255.255.255');
+        $this->assertEquals(IPv4::create('255.255.255.255', '255.255.255.255')->mask(), '255.255.255.255');
+        $this->assertEquals(IPv4::create('192.168/16')->mask(), '255.255.0.0');
+        $this->assertEquals(IPv4::create('192.168.100.15', '255.255.255.252')->mask(), '255.255.255.252');
+        $this->assertEquals(IPv4::create('10/8')->mask(), '255.0.0.0');
     }
 
     public function testCidr()
@@ -160,12 +177,36 @@ class IPv4Test extends PHPUnit_Framework_TestCase
         $this->assertEquals(IPv4::create('1.2.3.4/4')->netClass(), '-');
     }
 
-    public function testMatch()
+    public function testLtEq()
     {
-        $this->assertTrue(IPv4::create()->match(IPv4::create()));
-        $this->assertTrue(IPv4::create('255.255.255.255')->match(IPv4::create(0xFFFFFFFF)));
-        $this->assertTrue(IPv4::create('192.168.100.100')->match(IPv4::create('192.168/16')));
-        $this->assertFalse(IPv4::create('192.167.100.100')->match(IPv4::create('192.168/16')));
+        $this->assertTrue(IPv4::create()->ltEq(IPv4::create()));
+        $this->assertTrue(IPv4::create('255.255.255.255')->ltEq(IPv4::create(0xFFFFFFFF)));
+        $this->assertFalse(IPv4::create('192.168.100.100')->ltEq(IPv4::create('192.168/16')));
+        $this->assertTrue(IPv4::create('192.167.100.100')->ltEq(IPv4::create('192.168/16')));
+    }
+
+    public function testGtEq()
+    {
+        $this->assertTrue(IPv4::create()->gtEq(IPv4::create()));
+        $this->assertTrue(IPv4::create('255.255.255.255')->gtEq(IPv4::create(0xFFFFFFFF)));
+        $this->assertTrue(IPv4::create('192.168.100.100')->gtEq(IPv4::create('192.168/16')));
+        $this->assertFalse(IPv4::create('192.167.100.100')->gtEq(IPv4::create('192.168/16')));
+    }
+
+    public function testContains()
+    {
+        $this->assertTrue(IPv4::create()->contains(IPv4::create()));
+        $this->assertTrue(IPv4::create('255.255.255.255')->contains(IPv4::create(0xFFFFFFFF)));
+        $this->assertTrue(IPv4::create('192.168.100.100')->contains(IPv4::create('192.168/16')));
+        $this->assertFalse(IPv4::create('192.167.100.100')->contains(IPv4::create('192.168/16')));
+    }
+
+    public function testWithin()
+    {
+        $this->assertTrue(IPv4::create()->within(IPv4::create()));
+        $this->assertTrue(IPv4::create(0xFFFFFFFF)->within(IPv4::create('255.255.255.255')));
+        $this->assertTrue(IPv4::create('192.168/16')->within(IPv4::create('192.168.100.100')));
+        $this->assertFalse(IPv4::create('192.168/16')->within(IPv4::create('192.167.100.100')));
     }
 
     public function testToString()

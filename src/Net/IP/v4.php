@@ -73,14 +73,34 @@ class v4 extends BaseAddress
         return $this->maxPrefixLength - $bitsCount;
     }
 
-    public function network(): int
+    public function first(): Address
     {
-        return $this->addr & $this->mask;
+        return new self($this->addr & $this->mask);
     }
 
-    public function broadcast(): int
+    public function last(): Address
     {
-        return $this->network() + $this->negativeMask();
+        return new self(($this->addr & $this->mask) + $this->negativeMask());
+    }
+
+    public function ltEq(Address $addr): bool
+    {
+        return $this->addr <= $addr->numeric();
+    }
+
+    public function gtEq(Address $addr): bool
+    {
+        return $this->addr >= $addr->numeric();
+    }
+
+    public function addr(): string
+    {
+        return Utils::toString($this->addr);
+    }
+
+    public function mask(): string
+    {
+        return Utils::toString($this->mask);
     }
 
     public function cidr(): string
@@ -102,7 +122,7 @@ class v4 extends BaseAddress
     public function netType(): string
     {
         for ($i=0; $i<count(Utils::$networkTypes); $i++) {
-            if ($this->match(self::create(Utils::$networkTypes[$i]['AddressBlock']))) {
+            if ($this->contains(self::create(Utils::$networkTypes[$i]['AddressBlock']))) {
                 return Utils::$networkTypes[$i]['PresentUse'];
             }
         }
@@ -110,31 +130,21 @@ class v4 extends BaseAddress
         return 'Public';
     }
 
-    // TODO: $scope - array of Address objects
-    public function match($scope): bool
+    public function network(): self
     {
-        if (is_array($scope)) {
-            for ($i=0; $i<count($scope); $i++) {
-                if ($this->match(self::create($scope[$i]))) {
-                    return true;
-                }
-            }
-        } else if ($scope instanceof Address) {
-            return
-                ($scope->network() <= $this->numeric())
-                && ($scope->broadcast() >= $this->numeric());
-        } else {
-            throw new \InvalidArgumentException('Wrong scope argument');
-        }
+        return $this->first();
+    }
 
-        return false;
+    public function broadcast(): self
+    {
+        return $this->last();
     }
 
     public function netClass(): string
     {
-        if ($this->match(Utils::$privateNetworks)) {
+        if ($this->contains(Utils::$privateNetworks)) {
             return 'E';
-        } else if ($this->match(Utils::$multicastNetworks)) {
+        } else if ($this->contains(Utils::$multicastNetworks)) {
             return 'D';
         } else if ($this->mask >= 0xFFFFFF00) {
             return 'C';

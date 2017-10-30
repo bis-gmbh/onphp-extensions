@@ -16,17 +16,22 @@ abstract class BaseAddress implements Address
     protected $maxPrefixLength;
 
     abstract public function assign($anyFormat, $mask = null): Address;
+
     abstract public function numeric(): int;
     abstract public function netmask(): int;
     abstract public function negativeMask(): int;
+
     abstract public function prefixLength(): int;
-    abstract public function network(): int;
-    abstract public function broadcast(): int;
+
+    abstract public function ltEq(Address $value): bool;
+    abstract public function gtEq(Address $value): bool;
+
+    abstract public function addr(): string;
+    abstract public function mask(): string;
     abstract public function cidr(): string;
     abstract public function range(): string;
     abstract public function reverse(): string;
     abstract public function netType(): string;
-    abstract public function match($scope): bool;
 
     public function version(): int
     {
@@ -46,9 +51,9 @@ abstract class BaseAddress implements Address
             return 1;
         } else if ($prefixLength === 0) {
             return $this->negativeMask();
+        } else {
+            return $this->negativeMask() + 1;
         }
-
-        return $this->broadcast() - $this->network() + 1;
     }
 
     public function numHosts(): int
@@ -60,6 +65,33 @@ abstract class BaseAddress implements Address
     public function hostBits(): int
     {
         return $this->maxPrefixLength - $this->prefixLength();
+    }
+
+    public function contains($scope): bool
+    {
+        if (is_array($scope)) {
+            for ($i=0; $i<count($scope); $i++) {
+                if (
+                    $scope[$i] instanceof Address
+                    && $this->contains($scope[$i])
+                ) {
+                    return true;
+                } else if ($this->contains(self::create($scope[$i]))) {
+                    return true;
+                }
+            }
+        } else if ($scope instanceof Address) {
+            return $this->gtEq($scope->first()) && $this->ltEq($scope->last());
+        } else {
+            throw new \InvalidArgumentException('Wrong scope argument');
+        }
+
+        return false;
+    }
+
+    public function within(Address $addr): bool
+    {
+        return $addr->first()->gtEq($this->first()) && $addr->last()->ltEq($this->last());
     }
 
     public function __toString(): string
