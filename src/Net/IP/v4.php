@@ -8,31 +8,21 @@
 
 namespace Onphp\Extensions\Net\IP;
 
-class v4 implements Address
+class v4 extends BaseAddress
 {
-    const VERSION = 4;
-
-    private $addr = 0;
-    private $mask = 0xFFFFFFFF;
-
     public function __construct($anyFormat = null, $mask = null)
     {
+        $this->version = 4;
+        $this->addr = 0;
+        $this->mask = 0xFFFFFFFF;
+        $this->maxPrefixLength = 32;
+
         if ($anyFormat !== null) {
             $this->assign($anyFormat, $mask);
         }
     }
 
-    public static function version(): int
-    {
-        return self::VERSION;
-    }
-
-    public static function create($anyFormat = null, $mask = null): Address
-    {
-        return new self($anyFormat, $mask);
-    }
-
-    public function assign($anyFormat, $maskString = null)
+    public function assign($anyFormat, $maskString = null): Address
     {
         if (Utils::detectFormat($anyFormat) === 'numeric') {
             if ($maskString !== null) {
@@ -53,6 +43,8 @@ class v4 implements Address
         } else {
             throw new \InvalidArgumentException('Wrong arguments');
         }
+
+        return $this;
     }
 
     public function numeric(): int
@@ -65,21 +57,20 @@ class v4 implements Address
         return $this->mask;
     }
 
-    // TODO: rename method to 'negativeMask'
-    public function reverseMasc(): int
+    public function negativeMask(): int
     {
         return (PHP_INT_SIZE == 8 ? (~$this->mask) & 0x00000000FFFFFFFF : ~$this->mask);
     }
 
-    public function maskBits(): int
+    public function prefixLength(): int
     {
         $bitsCount = 0;
 
-        for ($i=0; $i<32; $i++) {
-            $bitsCount += ($this->reverseMasc() >> $i) & 1;
+        for ($i=0; $i<$this->maxPrefixLength; $i++) {
+            $bitsCount += ($this->negativeMask() >> $i) & 1;
         }
 
-        return 32 - $bitsCount;
+        return $this->maxPrefixLength - $bitsCount;
     }
 
     public function network(): int
@@ -89,34 +80,12 @@ class v4 implements Address
 
     public function broadcast(): int
     {
-        return $this->network() + $this->reverseMasc();
-    }
-
-    public function numAddrs(): int
-    {
-        if ($this->mask === 0xFFFFFFFF) {
-            return 1;
-        } else if ($this->mask === 0) {
-            return 0xFFFFFFFF;
-        }
-
-        return $this->broadcast() - $this->network() + 1;
-    }
-
-    public function numHosts(): int
-    {
-        $num = $this->numAddrs();
-        return ($num > 2) ? ($num - 2) : 1;
-    }
-
-    public function hostBits(): int
-    {
-        return 32 - $this->maskBits();
+        return $this->network() + $this->negativeMask();
     }
 
     public function cidr(): string
     {
-        return Utils::toString($this->addr) . '/' . $this->maskBits();
+        return Utils::toString($this->addr) . '/' . $this->prefixLength();
     }
 
     public function range(): string
@@ -175,10 +144,5 @@ class v4 implements Address
             return 'A';
         }
         return '-';
-    }
-
-    public function __toString(): string
-    {
-        return $this->cidr();
     }
 }

@@ -10,13 +10,13 @@ namespace Onphp\Extensions\Net\IP;
 
 interface Address
 {
-    public static function version(): int;
+    public function version(): int;
     public static function create($anyFormat = null, $mask = null): Address;
-    public function assign($anyFormat, $mask = null);
+    public function assign($anyFormat, $mask = null): Address;
     public function numeric(): int;
     public function netmask(): int;
-    public function reverseMasc(): int;
-    public function maskBits(): int;
+    public function negativeMask(): int;
+    public function prefixLength(): int;
     public function network(): int;
     public function broadcast(): int;
     public function numAddrs(): int;

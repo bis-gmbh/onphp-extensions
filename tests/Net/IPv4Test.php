@@ -52,30 +52,30 @@ class IPv4Test extends PHPUnit_Framework_TestCase
 
     public function testReverseMask()
     {
-        $this->assertEquals(IPv4::create(0)->reverseMasc(), 0);
-        $this->assertEquals(IPv4::create('0.0.0.0', '255.255.255.255')->reverseMasc(), 0);
-        $this->assertEquals(IPv4::create('0.0.0.0', '0.0.0.0')->reverseMasc(), 0xFFFFFFFF);
-        $this->assertEquals(IPv4::create('0', '255.255.255.0')->reverseMasc(), 0x000000FF);
-        $this->assertEquals(IPv4::create('0', '255.255.0.0')->reverseMasc(), 0x0000FFFF);
-        $this->assertEquals(IPv4::create('0', '255')->reverseMasc(), 0x00FFFFFF);
-        $this->assertEquals(IPv4::create('0', '255.255.255.252')->reverseMasc(), 0x00000003);
-        $this->assertEquals(IPv4::create('0.0.0.0/30')->reverseMasc(), 0x00000003);
+        $this->assertEquals(IPv4::create(0)->negativeMask(), 0);
+        $this->assertEquals(IPv4::create('0.0.0.0', '255.255.255.255')->negativeMask(), 0);
+        $this->assertEquals(IPv4::create('0.0.0.0', '0.0.0.0')->negativeMask(), 0xFFFFFFFF);
+        $this->assertEquals(IPv4::create('0', '255.255.255.0')->negativeMask(), 0x000000FF);
+        $this->assertEquals(IPv4::create('0', '255.255.0.0')->negativeMask(), 0x0000FFFF);
+        $this->assertEquals(IPv4::create('0', '255')->negativeMask(), 0x00FFFFFF);
+        $this->assertEquals(IPv4::create('0', '255.255.255.252')->negativeMask(), 0x00000003);
+        $this->assertEquals(IPv4::create('0.0.0.0/30')->negativeMask(), 0x00000003);
 
-        $this->assertEquals(IPv4::create('0.0.0.0', '255.0.13.187')->reverseMasc(), 0x00FFF244);
+        $this->assertEquals(IPv4::create('0.0.0.0', '255.0.13.187')->negativeMask(), 0x00FFF244);
     }
 
     public function testMaskBits()
     {
-        $this->assertEquals(IPv4::create(0)->maskBits(), 32);
-        $this->assertEquals(IPv4::create('0.0.0.0', '255.255.255.255')->maskBits(), 32);
-        $this->assertEquals(IPv4::create('0.0.0.0', '0.0.0.0')->maskBits(), 0);
-        $this->assertEquals(IPv4::create('0', '255.255.255.0')->maskBits(), 24);
-        $this->assertEquals(IPv4::create('0', '255.255.0.0')->maskBits(), 16);
-        $this->assertEquals(IPv4::create('0', '255')->maskBits(), 8);
-        $this->assertEquals(IPv4::create('0', '255.255.255.252')->maskBits(), 30);
-        $this->assertEquals(IPv4::create('0.0.0.0/30')->maskBits(), 30);
+        $this->assertEquals(IPv4::create(0)->prefixLength(), 32);
+        $this->assertEquals(IPv4::create('0.0.0.0', '255.255.255.255')->prefixLength(), 32);
+        $this->assertEquals(IPv4::create('0.0.0.0', '0.0.0.0')->prefixLength(), 0);
+        $this->assertEquals(IPv4::create('0', '255.255.255.0')->prefixLength(), 24);
+        $this->assertEquals(IPv4::create('0', '255.255.0.0')->prefixLength(), 16);
+        $this->assertEquals(IPv4::create('0', '255')->prefixLength(), 8);
+        $this->assertEquals(IPv4::create('0', '255.255.255.252')->prefixLength(), 30);
+        $this->assertEquals(IPv4::create('0.0.0.0/30')->prefixLength(), 30);
 
-        $this->assertEquals(IPv4::create('0.0.0.0', '255.0.13.187')->maskBits(), 17);
+        $this->assertEquals(IPv4::create('0.0.0.0', '255.0.13.187')->prefixLength(), 17);
     }
 
     public function testNetwork()
