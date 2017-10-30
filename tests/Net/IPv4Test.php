@@ -167,4 +167,15 @@ class IPv4Test extends PHPUnit_Framework_TestCase
         $this->assertTrue(IPv4::create('192.168.100.100')->match(IPv4::create('192.168/16')));
         $this->assertFalse(IPv4::create('192.167.100.100')->match(IPv4::create('192.168/16')));
     }
+
+    public function testToString()
+    {
+        $ip = new IPv4('10.10.10.3', '255.255.255.252');
+
+        $this->assertEquals(sprintf("%s", $ip), '10.10.10.3/30');
+
+        $ip->assign('192.168', '255.255.255');
+
+        $this->assertEquals(sprintf("%s", $ip), '192.168.0.0/24');
+    }
 }

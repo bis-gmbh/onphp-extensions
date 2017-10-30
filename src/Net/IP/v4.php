@@ -176,4 +176,9 @@ class v4 implements Address
         }
         return '-';
     }
+
+    public function __toString(): string
+    {
+        return $this->cidr();
+    }
 }
