@@ -10,34 +10,121 @@ namespace Onphp\Extensions\Net\IP;
 
 interface Address
 {
-    public function version(): int;
+    /**
+     * @return int
+     */
+    public function version();
 
-    public static function create($anyFormat = null, $mask = null): Address;
-    public function assign($anyFormat, $mask = null): Address;
+    /**
+     * @param mixed $anyFormat
+     * @param mixed $mask
+     * @return Address
+     */
+    public static function create($anyFormat = null, $mask = null);
 
+    /**
+     * @param mixed $anyFormat
+     * @param mixed $mask
+     * @return Address
+     */
+    public function assign($anyFormat, $mask = null);
+
+    /**
+     * @return mixed numeric value depend on ip version
+     */
     public function numeric();
+
+    /**
+     * @return mixed numeric value depend on ip version
+     */
     public function netmask();
+
+    /**
+     * @return mixed numeric value depend on ip version
+     */
     public function negativeMask();
 
-    public function prefixLength(): int;
+    /**
+     * @return int
+     */
+    public function prefixLength();
 
-    public function first(): Address;
-    public function last(): Address;
+    /**
+     * @return Address
+     */
+    public function first();
 
-    public function numAddrs(): int;
-    public function numHosts(): int;
-    public function hostBits(): int;
+    /**
+     * @return Address
+     */
+    public function last();
 
-    public function ltEq(Address $addr): bool;
-    public function gtEq(Address $addr): bool;
+    /**
+     * @return int
+     */
+    public function numAddrs();
 
-    public function contains($scope): bool;
-    public function within(Address $addr): bool;
+    /**
+     * @return int
+     */
+    public function numHosts();
 
-    public function addr(): string;
-    public function mask(): string;
-    public function cidr(): string;
-    public function range(): string;
-    public function reverse(): string;
-    public function netType(): string;
+    /**
+     * @return int
+     */
+    public function hostBits();
+
+    /**
+     * @param Address $addr
+     * @return bool
+     */
+    public function ltEq(Address $addr);
+
+    /**
+     * @param Address $addr
+     * @return bool
+     */
+    public function gtEq(Address $addr);
+
+    /**
+     * @param $scope
+     * @return bool
+     */
+    public function contains($scope);
+
+    /**
+     * @param Address $addr
+     * @return bool
+     */
+    public function within(Address $addr);
+
+    /**
+     * @return string
+     */
+    public function addr();
+
+    /**
+     * @return string
+     */
+    public function mask();
+
+    /**
+     * @return string
+     */
+    public function cidr();
+
+    /**
+     * @return string
+     */
+    public function range();
+
+    /**
+     * @return string
+     */
+    public function reverse();
+
+    /**
+     * @return string
+     */
+    public function netType();
 }

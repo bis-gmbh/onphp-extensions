@@ -26,12 +26,20 @@ class Utils6
         ]
     ];
 
-    public static function isNumeric($value): bool
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    public static function isNumeric($value)
     {
         return is_numeric($value) && ($value >= 0);
     }
 
-    public static function isTextual($addr): bool
+    /**
+     * @param mixed $addr
+     * @return bool
+     */
+    public static function isTextual($addr)
     {
         try {
             $result = inet_pton($addr);
@@ -43,7 +51,11 @@ class Utils6
         return false;
     }
 
-    public static function isCIDR($cidr): bool
+    /**
+     * @param mixed $cidr
+     * @return bool
+     */
+    public static function isCIDR($cidr)
     {
         if (false === is_string($cidr)) {
             return false;
@@ -62,7 +74,11 @@ class Utils6
         return false;
     }
 
-    public static function detectFormat($addr): string
+    /**
+     * @param mixed $addr
+     * @return string
+     */
+    public static function detectFormat($addr)
     {
         if (self::isNumeric($addr)) {
             return 'numeric';
@@ -116,7 +132,7 @@ class Utils6
      * @param string $addr
      * @return resource|object
      */
-    public static function toNumeric(string $addr)
+    public static function toNumeric($addr)
     {
         if (self::isTextual($addr) === false) {
             throw new \InvalidArgumentException('Wrong addr format');
@@ -129,7 +145,7 @@ class Utils6
      * @param resource|object $addr
      * @return string
      */
-    public static function toTextual($addr): string
+    public static function toTextual($addr)
     {
         if (self::isGMP($addr) === false) {
             throw new \InvalidArgumentException('Wrong addr argument');
@@ -145,7 +161,7 @@ class Utils6
      * @param resource|object $addr
      * @return string
      */
-    public static function toBinaryString($addr): string
+    public static function toBinaryString($addr)
     {
         if (self::isGMP($addr) === false) {
             throw new \InvalidArgumentException('Wrong addr argument');
@@ -154,7 +170,11 @@ class Utils6
         return str_pad(decbin(gmp_strval($addr)), 128, '0', STR_PAD_LEFT);
     }
 
-    private static function isGMP($value): bool
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    private static function isGMP($value)
     {
         if (
             version_compare(PHP_VERSION, '5.6.0') >= 0

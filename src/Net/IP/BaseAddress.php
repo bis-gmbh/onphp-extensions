@@ -15,35 +15,35 @@ abstract class BaseAddress implements Address
     protected $mask;
     protected $maxPrefixLength;
 
-    abstract public function assign($anyFormat, $mask = null): Address;
+    abstract public function assign($anyFormat, $mask = null);
 
-    abstract public function numeric(): int;
-    abstract public function netmask(): int;
-    abstract public function negativeMask(): int;
+    abstract public function numeric();
+    abstract public function netmask();
+    abstract public function negativeMask();
 
-    abstract public function prefixLength(): int;
+    abstract public function prefixLength();
 
-    abstract public function ltEq(Address $value): bool;
-    abstract public function gtEq(Address $value): bool;
+    abstract public function ltEq(Address $value);
+    abstract public function gtEq(Address $value);
 
-    abstract public function addr(): string;
-    abstract public function mask(): string;
-    abstract public function cidr(): string;
-    abstract public function range(): string;
-    abstract public function reverse(): string;
-    abstract public function netType(): string;
+    abstract public function addr();
+    abstract public function mask();
+    abstract public function cidr();
+    abstract public function range();
+    abstract public function reverse();
+    abstract public function netType();
 
-    public function version(): int
+    public function version()
     {
         return $this->version;
     }
 
-    public static function create($anyFormat = null, $mask = null): Address
+    public static function create($anyFormat = null, $mask = null)
     {
         return new static($anyFormat, $mask);
     }
 
-    public function numAddrs(): int
+    public function numAddrs()
     {
         $prefixLength = $this->prefixLength();
 
@@ -56,7 +56,7 @@ abstract class BaseAddress implements Address
         }
     }
 
-    public function numHosts(): int
+    public function numHosts()
     {
         $num = $this->numAddrs();
         return ($num > 2) ? ($num - 2) : 1;
@@ -67,7 +67,7 @@ abstract class BaseAddress implements Address
         return $this->maxPrefixLength - $this->prefixLength();
     }
 
-    public function contains($scope): bool
+    public function contains($scope)
     {
         if (is_array($scope)) {
             for ($i=0; $i<count($scope); $i++) {
@@ -89,12 +89,12 @@ abstract class BaseAddress implements Address
         return false;
     }
 
-    public function within(Address $addr): bool
+    public function within(Address $addr)
     {
         return $addr->first()->gtEq($this->first()) && $addr->last()->ltEq($this->last());
     }
 
-    public function __toString(): string
+    public function __toString()
     {
         return $this->cidr();
     }

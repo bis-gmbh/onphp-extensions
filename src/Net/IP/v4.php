@@ -22,7 +22,7 @@ class v4 extends BaseAddress
         }
     }
 
-    public function assign($anyFormat, $maskString = null): Address
+    public function assign($anyFormat, $maskString = null)
     {
         if (Utils::detectFormat($anyFormat) === 'numeric') {
             if ($maskString !== null) {
@@ -47,22 +47,22 @@ class v4 extends BaseAddress
         return $this;
     }
 
-    public function numeric(): int
+    public function numeric()
     {
         return $this->addr;
     }
 
-    public function netmask(): int
+    public function netmask()
     {
         return $this->mask;
     }
 
-    public function negativeMask(): int
+    public function negativeMask()
     {
         return (PHP_INT_SIZE == 8 ? (~$this->mask) & 0x00000000FFFFFFFF : ~$this->mask);
     }
 
-    public function prefixLength(): int
+    public function prefixLength()
     {
         $bitsCount = 0;
 
@@ -73,53 +73,53 @@ class v4 extends BaseAddress
         return $this->maxPrefixLength - $bitsCount;
     }
 
-    public function first(): Address
+    public function first()
     {
         return new self($this->addr & $this->mask);
     }
 
-    public function last(): Address
+    public function last()
     {
         return new self(($this->addr & $this->mask) + $this->negativeMask());
     }
 
-    public function ltEq(Address $addr): bool
+    public function ltEq(Address $addr)
     {
         return $this->addr <= $addr->numeric();
     }
 
-    public function gtEq(Address $addr): bool
+    public function gtEq(Address $addr)
     {
         return $this->addr >= $addr->numeric();
     }
 
-    public function addr(): string
+    public function addr()
     {
         return Utils::toString($this->addr);
     }
 
-    public function mask(): string
+    public function mask()
     {
         return Utils::toString($this->mask);
     }
 
-    public function cidr(): string
+    public function cidr()
     {
         return Utils::toString($this->addr) . '/' . $this->prefixLength();
     }
 
-    public function range(): string
+    public function range()
     {
-        return Utils::toString($this->network()) . ' - ' . Utils::toString($this->broadcast());
+        return $this->network() . ' - ' . $this->broadcast();
     }
 
-    public function reverse(): string
+    public function reverse()
     {
         $octets = explode('.', Utils::toString($this->addr));
         return implode('.', array_reverse($octets)) . '.in-addr.arpa';
     }
 
-    public function netType(): string
+    public function netType()
     {
         for ($i=0; $i<count(Utils::$networkTypes); $i++) {
             if ($this->contains(self::create(Utils::$networkTypes[$i]['AddressBlock']))) {
@@ -130,17 +130,26 @@ class v4 extends BaseAddress
         return 'Public';
     }
 
-    public function network(): self
+    /**
+     * @return Address|v4
+     */
+    public function network()
     {
         return $this->first();
     }
 
-    public function broadcast(): self
+    /**
+     * @return Address|v4
+     */
+    public function broadcast()
     {
         return $this->last();
     }
 
-    public function netClass(): string
+    /**
+     * @return string
+     */
+    public function netClass()
     {
         if ($this->contains(Utils::$privateNetworks)) {
             return 'E';

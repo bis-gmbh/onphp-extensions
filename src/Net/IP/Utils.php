@@ -84,22 +84,38 @@ class Utils
     protected static $octetOffsets = [24, 16, 8, 0];
     protected static $octetMasks = [0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF];
 
-    public static function isLong($long): bool
+    /**
+     * @param mixed $long
+     * @return bool
+     */
+    public static function isLong($long)
     {
         return is_int($long) && ($long >= 0 && $long <= 0xFFFFFFFF);
     }
 
-    public static function isString($addr): bool
+    /**
+     * @param mixed $addr
+     * @return bool
+     */
+    public static function isString($addr)
     {
         return is_string($addr) && (bool)preg_match(self::REGEXP_IP, $addr);
     }
 
-    public static function isCIDR($cidr): bool
+    /**
+     * @param mixed $cidr
+     * @return bool
+     */
+    public static function isCIDR($cidr)
     {
         return is_string($cidr) && (bool)preg_match(self::REGEXP_CIDR, $cidr);
     }
 
-    public static function detectFormat($addr): string
+    /**
+     * @param mixed $addr
+     * @return string
+     */
+    public static function detectFormat($addr)
     {
         if (self::isLong($addr)) {
             return 'numeric';
@@ -114,7 +130,11 @@ class Utils
         return 'unknown';
     }
 
-    public static function getLongPrefixFromCIDR($cidr): int
+    /**
+     * @param string $cidr
+     * @return int
+     */
+    public static function getLongPrefixFromCIDR($cidr)
     {
         if (self::isCIDR($cidr) === false) {
             throw new \InvalidArgumentException('Wrong cidr format');
@@ -125,7 +145,11 @@ class Utils
         return self::toLong($cidrParts[0]);
     }
 
-    public static function getMaskBitsFromCIDR($cidr): int
+    /**
+     * @param mixed $cidr
+     * @return int
+     */
+    public static function getMaskBitsFromCIDR($cidr)
     {
         if (self::isCIDR($cidr) === false) {
             throw new \InvalidArgumentException('Wrong cidr format');
@@ -138,7 +162,11 @@ class Utils
         return (PHP_INT_SIZE == 8 ? $mask & 0x00000000FFFFFFFF : $mask);
     }
 
-    public static function toLong(string $addr): int
+    /**
+     * @param string $addr
+     * @return int
+     */
+    public static function toLong($addr)
     {
         if (self::isString($addr) === false) {
             throw new \InvalidArgumentException('Wrong addr format');
@@ -159,7 +187,11 @@ class Utils
         return $num;
     }
 
-    public static function toString(int $addr): string
+    /**
+     * @param int $addr
+     * @return string
+     */
+    public static function toString($addr)
     {
         if (self::isLong($addr) === false) {
             throw new \InvalidArgumentException('Wrong addr format');
@@ -174,7 +206,11 @@ class Utils
         return implode('.', $octets);
     }
 
-    public static function toBinaryString(int $addr): string
+    /**
+     * @param int $addr
+     * @return string
+     */
+    public static function toBinaryString($addr)
     {
         if ($addr < 0 || $addr > 0xFFFFFFFF) {
             throw new \OutOfRangeException('Argument $nMask must be between 0 and 0xFFFFFFFF');
