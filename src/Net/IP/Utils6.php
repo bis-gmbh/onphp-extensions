@@ -18,7 +18,10 @@ class Utils6
      */
     public static function isNumeric($value)
     {
-        return is_numeric($value) && ($value >= 0);
+        return (
+            (is_string($value) || is_numeric($value))
+            && preg_match('/^(0|0x)?[0-9a-f]+$/i', $value)
+        );
     }
 
     /**
