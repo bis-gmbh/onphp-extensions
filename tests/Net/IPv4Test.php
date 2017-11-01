@@ -47,6 +47,9 @@ class IPv4Test extends PHPUnit_Framework_TestCase
 
         // arbitrary masks are allowed, but their text representations will be incorrect
         $this->assertEquals(IPv4::create('0.0.0.0', '255.0.13.187')->netmask(), 0xFF000DBB);
+
+        $this->expectException('InvalidArgumentException');
+        $this->assertEquals(IPv4::create('0', 0xFFFFFF00)->netmask(), 0xFFFFFF00);
     }
 
     public function testNegativeMask()

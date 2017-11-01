@@ -30,8 +30,12 @@ class v4 extends BaseAddress
             }
             $this->addr = $anyFormat;
         } else if (Utils::detectFormat($anyFormat) === 'string') {
-            if (Utils::detectFormat($maskString) === 'string') {
-                $this->mask = Utils::toLong($maskString);
+            if ($maskString !== null) {
+                if (Utils::detectFormat($maskString) === 'string') {
+                    $this->mask = Utils::toLong($maskString);
+                } else {
+                    throw new \InvalidArgumentException('Mask argument must have string format');
+                }
             }
             $this->addr = Utils::toLong($anyFormat);
         } else if (Utils::detectFormat($anyFormat) === 'cidr') {
