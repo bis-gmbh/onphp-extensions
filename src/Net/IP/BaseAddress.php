@@ -15,24 +15,6 @@ abstract class BaseAddress implements Address
     protected $mask;
     protected $maxPrefixLength;
 
-    abstract public function assign($anyFormat, $mask = null);
-
-    abstract public function numeric();
-    abstract public function netmask();
-    abstract public function negativeMask();
-
-    abstract public function prefixLength();
-
-    abstract public function ltEq(Address $value);
-    abstract public function gtEq(Address $value);
-
-    abstract public function addr();
-    abstract public function mask();
-    abstract public function cidr();
-    abstract public function range();
-    abstract public function reverse();
-    abstract public function netType();
-
     public function version()
     {
         return $this->version;
