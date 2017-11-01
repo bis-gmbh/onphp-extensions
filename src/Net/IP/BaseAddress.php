@@ -15,6 +15,18 @@ abstract class BaseAddress implements Address
     protected $mask;
     protected $maxPrefixLength;
 
+    /**
+     * @param Address $addr
+     * @return bool
+     */
+    abstract public function ltEq(Address $addr);
+
+    /**
+     * @param Address $addr
+     * @return bool
+     */
+    abstract public function gtEq(Address $addr);
+
     public function version()
     {
         return $this->version;

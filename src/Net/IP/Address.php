@@ -75,18 +75,6 @@ interface Address
     public function hostBits();
 
     /**
-     * @param Address $addr
-     * @return bool
-     */
-    public function ltEq(Address $addr);
-
-    /**
-     * @param Address $addr
-     * @return bool
-     */
-    public function gtEq(Address $addr);
-
-    /**
      * @param $scope
      * @return bool
      */
