@@ -25,14 +25,7 @@ class Utils6
      */
     public static function isTextual($addr)
     {
-        try {
-            $result = inet_pton($addr);
-            return $result !== false;
-        } catch (\Exception $e) {
-            // nop
-        }
-
-        return false;
+        return filter_var($addr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false;
     }
 
     /**
