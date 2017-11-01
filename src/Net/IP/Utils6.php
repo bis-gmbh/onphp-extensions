@@ -10,6 +10,8 @@ namespace Onphp\Extensions\Net\IP;
 
 class Utils6
 {
+    const REGEXP_PREFIX_LENGTH = '/^([0-9]|[1-9][0-9]|1[0-1][0-9]|1[0-9][0-8])$/i'; // 0-128
+
     /**
      * @param mixed $value
      * @return bool
@@ -43,7 +45,7 @@ class Utils6
         if (
             count($cidrParts) === 2
             && self::isTextual($cidrParts[0])
-            && $cidrParts[1] >= 0 && $cidrParts[1] <= 128
+            && preg_match(self::REGEXP_PREFIX_LENGTH, $cidrParts[1])
         ) {
             return true;
         }

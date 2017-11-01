@@ -44,12 +44,9 @@ class IPUtils6Test extends PHPUnit_Framework_TestCase
 
     public function testIsCIDR()
     {
-        $this->assertFalse(IPUtils::isCIDR(null));
-        $this->assertFalse(IPUtils::isCIDR(''));
-        $this->assertFalse(IPUtils::isCIDR('/'));
-        $this->assertFalse(IPUtils::isCIDR('/129'));
-        $this->assertFalse(IPUtils::isCIDR('a:b:c:d:e:f:g:0'));
-        $this->assertFalse(IPUtils::isCIDR('255.255.255.255/48'));
+        foreach ($this->invalidTextualAddresses as $invalidAddr) {
+            $this->assertFalse(IPUtils::isCIDR($invalidAddr));
+        }
         $this->assertTrue(IPUtils::isCIDR('1111:2222::5555:6666:7777:8888/0'));
         $this->assertTrue(IPUtils::isCIDR('0:0:0:0:0:FFFF:129.144.52.38/64'));
         $this->assertTrue(IPUtils::isCIDR('0:1:2:3:4:5:6:7/128'));
