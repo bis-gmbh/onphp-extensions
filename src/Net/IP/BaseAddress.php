@@ -25,25 +25,6 @@ abstract class BaseAddress implements Address
         return new static($anyFormat, $mask);
     }
 
-    public function numAddrs()
-    {
-        $prefixLength = $this->prefixLength();
-
-        if ($prefixLength === $this->maxPrefixLength) {
-            return 1;
-        } else if ($prefixLength === 0) {
-            return $this->negativeMask();
-        } else {
-            return $this->negativeMask() + 1;
-        }
-    }
-
-    public function numHosts()
-    {
-        $num = $this->numAddrs();
-        return ($num > 2) ? ($num - 2) : 1;
-    }
-
     public function hostBits(): int
     {
         return $this->maxPrefixLength - $this->prefixLength();
