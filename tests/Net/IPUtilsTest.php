@@ -10,6 +10,13 @@ use \Onphp\Extensions\Net\IP\Utils as IPUtils;
 
 class IPUtilsTest extends PHPUnit_Framework_TestCase
 {
+    public $invalidStringAddresses = [];
+
+    public function setup()
+    {
+        $this->invalidStringAddresses = require 'data/ipv4-invalid.php';
+    }
+
     public function testIsLong()
     {
         $this->assertFalse(IPUtils::isLong(null));
@@ -24,10 +31,9 @@ class IPUtilsTest extends PHPUnit_Framework_TestCase
 
     public function testIsString()
     {
-        $this->assertFalse(IPUtils::isString(null));
-        $this->assertFalse(IPUtils::isString(''));
-        $this->assertFalse(IPUtils::isString('300'));
-        $this->assertFalse(IPUtils::isString('127.0.256.1'));
+        foreach ($this->invalidStringAddresses as $invalidAddr) {
+            $this->assertFalse(IPUtils::isString($invalidAddr));
+        }
         $this->assertTrue(IPUtils::isString('0.0.0.0'));
         $this->assertTrue(IPUtils::isString('127.0.0.1'));
         $this->assertTrue(IPUtils::isString('10.0.100.1'));
@@ -40,14 +46,9 @@ class IPUtilsTest extends PHPUnit_Framework_TestCase
 
     public function testIsCIDR()
     {
-        $this->assertFalse(IPUtils::isCIDR(null));
-        $this->assertFalse(IPUtils::isCIDR(''));
-        $this->assertFalse(IPUtils::isCIDR('/'));
-        $this->assertFalse(IPUtils::isCIDR('127.0.0.1'));
-        $this->assertFalse(IPUtils::isCIDR('0.0.400.0/0'));
-        $this->assertFalse(IPUtils::isCIDR('127.0.0.1/33'));
-        $this->assertFalse(IPUtils::isCIDR('192.168.100.2/'));
-        $this->assertFalse(IPUtils::isCIDR('/30'));
+        foreach ($this->invalidStringAddresses as $invalidAddr) {
+            $this->assertFalse(IPUtils::isCIDR($invalidAddr));
+        }
         $this->assertTrue(IPUtils::isCIDR('0.0.0.0/0'));
         $this->assertTrue(IPUtils::isCIDR('192.168.100.2/30'));
         $this->assertTrue(IPUtils::isCIDR('192.168.100/24'));
