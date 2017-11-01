@@ -151,11 +151,11 @@ class IPv4Test extends PHPUnit_Framework_TestCase
 
     public function testReverse()
     {
-        $this->assertEquals(IPv4::create(0)->reverse(), '0.0.0.0.in-addr.arpa');
-        $this->assertEquals(IPv4::create('255.255.255.255', '255.255.255.255')->reverse(), '255.255.255.255.in-addr.arpa');
-        $this->assertEquals(IPv4::create('192.168/16')->reverse(), '0.0.168.192.in-addr.arpa');
-        $this->assertEquals(IPv4::create('192.168.100.15', '255.255.255.252')->reverse(), '15.100.168.192.in-addr.arpa');
-        $this->assertEquals(IPv4::create('10/8')->reverse(), '0.0.0.10.in-addr.arpa');
+        $this->assertEquals(IPv4::create(0)->reverse(), '0.0.0.0.in-addr.arpa.');
+        $this->assertEquals(IPv4::create('255.255.255.255', '255.255.255.255')->reverse(), '255.255.255.255.in-addr.arpa.');
+        $this->assertEquals(IPv4::create('192.168/16')->reverse(), '0.0.168.192.in-addr.arpa.');
+        $this->assertEquals(IPv4::create('192.168.100.15', '255.255.255.252')->reverse(), '15.100.168.192.in-addr.arpa.');
+        $this->assertEquals(IPv4::create('10/8')->reverse(), '0.0.0.10.in-addr.arpa.');
     }
 
     public function testNetType()

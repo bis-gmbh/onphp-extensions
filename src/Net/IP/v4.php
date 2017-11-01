@@ -116,7 +116,7 @@ class v4 extends BaseAddress
     public function reverse()
     {
         $octets = explode('.', Utils::toString($this->addr));
-        return implode('.', array_reverse($octets)) . '.in-addr.arpa';
+        return implode('.', array_reverse($octets)) . '.in-addr.arpa.';
     }
 
     public function netType()
