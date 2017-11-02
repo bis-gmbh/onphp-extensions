@@ -96,36 +96,6 @@ class v4 extends BaseAddress
         }
     }
 
-    public function assign($anyFormat, $maskString = null)
-    {
-        if (self::isNumeric($anyFormat)) {
-            if ($maskString !== null) {
-                throw new \InvalidArgumentException('Mask argument not allowed');
-            }
-            $this->addr = $anyFormat;
-        } else if (self::isTextual($anyFormat)) {
-            if ($maskString !== null) {
-                if (self::isTextual($maskString)) {
-                    $this->mask = $this->fromTextual($maskString);
-                } else {
-                    throw new \InvalidArgumentException('Mask argument must have textual format');
-                }
-            }
-            $this->addr = $this->fromTextual($anyFormat);
-        } else if (self::isCIDR($anyFormat)) {
-            if ($maskString !== null) {
-                throw new \InvalidArgumentException('Mask argument not allowed');
-            }
-            $cidrParts = explode('/', $anyFormat);
-            $this->addr = $this->fromTextual($cidrParts[0]);
-            $this->mask = $this->maskFromPrefixLength(intval($cidrParts[1]));
-        } else {
-            throw new \InvalidArgumentException('Wrong arguments');
-        }
-
-        return $this;
-    }
-
     /**
      * @param mixed $long
      * @return bool
@@ -308,7 +278,7 @@ class v4 extends BaseAddress
      * @param string $addr
      * @return int
      */
-    private function fromTextual($addr)
+    protected function fromTextual($addr)
     {
         if (self::isTextual($addr) === false) {
             throw new \InvalidArgumentException('Wrong addr format');
@@ -352,7 +322,7 @@ class v4 extends BaseAddress
      * @param int $prefixLength
      * @return int
      */
-    private function maskFromPrefixLength($prefixLength)
+    protected function maskFromPrefixLength($prefixLength)
     {
         $mask = 0xFFFFFFFF << (32 - $prefixLength);
 

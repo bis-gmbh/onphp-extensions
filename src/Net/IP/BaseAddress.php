@@ -27,6 +27,18 @@ abstract class BaseAddress implements Address
      */
     abstract public function gtEq(Address $addr);
 
+    /**
+     * @param string $value
+     * @return mixed
+     */
+    abstract protected function fromTextual($value);
+
+    /**
+     * @param int $prefixLength
+     * @return mixed
+     */
+    abstract protected function maskFromPrefixLength($prefixLength);
+
     public function version()
     {
         return $this->version;
@@ -35,6 +47,72 @@ abstract class BaseAddress implements Address
     public static function create($anyFormat = null, $mask = null)
     {
         return new static($anyFormat, $mask);
+    }
+
+    public function assign($anyFormat, $maskString = null)
+    {
+        if (static::isNumeric($anyFormat)) {
+            if ($maskString !== null) {
+                throw new \InvalidArgumentException('Mask argument not allowed');
+            }
+            $this->addr = $this->fromNumeric($anyFormat);
+        } else if (static::isTextual($anyFormat)) {
+            if ($maskString !== null) {
+                if (static::isTextual($maskString)) {
+                    $this->mask = $this->fromTextual($maskString);
+                } else {
+                    throw new \InvalidArgumentException('Mask argument must have textual format');
+                }
+            }
+            $this->addr = $this->fromTextual($anyFormat);
+        } else if (static::isCIDR($anyFormat)) {
+            if ($maskString !== null) {
+                throw new \InvalidArgumentException('Mask argument not allowed');
+            }
+            $cidrParts = explode('/', $anyFormat);
+            $this->addr = $this->fromTextual($cidrParts[0]);
+            $this->mask = $this->maskFromPrefixLength(intval($cidrParts[1]));
+        } else {
+            throw new \InvalidArgumentException('Wrong arguments');
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    public static function isNumeric($value)
+    {
+        throw new \BadMethodCallException('Unimplemented method, must be overrided in a child class');
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    public static function isTextual($value)
+    {
+        throw new \BadMethodCallException('Unimplemented method, must be overrided in a child class');
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    public static function isCIDR($value)
+    {
+        throw new \BadMethodCallException('Unimplemented method, must be overrided in a child class');
+    }
+
+    /**
+     * @param mixed $value
+     * @return mixed
+     */
+    protected function fromNumeric($value)
+    {
+        return $value;
     }
 
     public function hostBits(): int

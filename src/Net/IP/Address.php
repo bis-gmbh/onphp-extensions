@@ -30,6 +30,11 @@ interface Address
     public function assign($anyFormat, $mask = null);
 
     /**
+     * @return mixed binary value
+     */
+    public function binary();
+
+    /**
      * @return mixed numeric value depend on ip version
      */
     public function numeric();
