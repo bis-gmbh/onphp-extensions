@@ -117,14 +117,6 @@ class v6 extends BaseAddress
         return '0x' . str_pad(gmp_strval($this->mask, 16), 32, '0', STR_PAD_LEFT);
     }
 
-    /**
-     * @return string hexadecimal negative netmask value representation
-     */
-    public function negativeMask()
-    {
-        return '0x' . str_pad(gmp_strval($this->gmp_not($this->mask), 16), 32, '0', STR_PAD_LEFT);
-    }
-
     public function prefixLength()
     {
         for (
@@ -220,6 +212,12 @@ class v6 extends BaseAddress
 
         $groups = explode(':', $reversedV4Part);
         return implode(':', array_reverse($groups)) . '.ip6.arpa.';
+    }
+
+    public function reverseMask()
+    {
+        $groups = str_split(str_pad(gmp_strval($this->mask, 16), 32, '0', STR_PAD_LEFT), 4);
+        return implode(':', array_reverse($groups));
     }
 
     public function netType()

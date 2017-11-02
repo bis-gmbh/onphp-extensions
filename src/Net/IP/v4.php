@@ -146,17 +146,12 @@ class v4 extends BaseAddress
         return $this->mask;
     }
 
-    public function negativeMask()
-    {
-        return (PHP_INT_SIZE == 8 ? (~$this->mask) & 0x00000000FFFFFFFF : ~$this->mask);
-    }
-
     public function prefixLength()
     {
         $bitsCount = 0;
 
         for ($i=0; $i<$this->maxPrefixLength; $i++) {
-            $bitsCount += ($this->negativeMask() >> $i) & 1;
+            $bitsCount += ($this->neg($this->mask) >> $i) & 1;
         }
 
         return $this->maxPrefixLength - $bitsCount;
@@ -185,9 +180,9 @@ class v4 extends BaseAddress
         if ($prefixLength === $this->maxPrefixLength) {
             return 1;
         } else if ($prefixLength === 0) {
-            return $this->negativeMask();
+            return $this->neg($this->mask);
         } else {
-            return $this->negativeMask() + 1;
+            return $this->neg($this->mask) + 1;
         }
     }
 
@@ -231,6 +226,12 @@ class v4 extends BaseAddress
     {
         $octets = explode('.', $this->toTextual($this->addr));
         return implode('.', array_reverse($octets)) . '.in-addr.arpa.';
+    }
+
+    public function reverseMask()
+    {
+        $octets = explode('.', $this->toTextual($this->mask));
+        return implode('.', array_reverse($octets));
     }
 
     public function netType()
@@ -347,6 +348,11 @@ class v4 extends BaseAddress
      */
     private function internalLastAddr()
     {
-        return (($this->addr & $this->mask) + $this->negativeMask());
+        return (($this->addr & $this->mask) + $this->neg($this->mask));
+    }
+
+    private function neg($value)
+    {
+        return (PHP_INT_SIZE == 8 ? (~$value) & 0x00000000FFFFFFFF : ~$value);
     }
 }

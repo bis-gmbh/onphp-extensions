@@ -50,11 +50,6 @@ interface Address
     public function netmask();
 
     /**
-     * @return mixed numeric value depend on ip version
-     */
-    public function negativeMask();
-
-    /**
      * @return int
      */
     public function prefixLength();
@@ -120,6 +115,11 @@ interface Address
      * @return string
      */
     public function reverse();
+
+    /**
+     * @return string
+     */
+    public function reverseMask();
 
     /**
      * @return string

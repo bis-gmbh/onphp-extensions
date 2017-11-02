@@ -119,20 +119,20 @@ class IPv6Test extends PHPUnit_Framework_TestCase
         $this->assertEquals(IPv6::create('::0.0.0.0', 0)->netmask(), '0x00000000000000000000000000000000');
     }
 
-    public function testNegativeMask()
+    public function testReverseMask()
     {
-        $this->assertEquals(IPv6::create(0)->negativeMask(), '0x00000000000000000000000000000000');
-        $this->assertEquals(IPv6::create('::0.0.0.0', 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff')->negativeMask(), '0x00000000000000000000000000000000');
-        $this->assertEquals(IPv6::create('::', 'ffff:ffff:ffff:ffff:ffff:ffff::')->negativeMask(), '0x000000000000000000000000ffffffff');
-        $this->assertEquals(IPv6::create('::', 'ffff:ffff:ffff:ffff::')->negativeMask(), '0x0000000000000000ffffffffffffffff');
-        $this->assertEquals(IPv6::create('::', 'ffff:ffff::')->negativeMask(), '0x00000000ffffffffffffffffffffffff');
-        $this->assertEquals(IPv6::create('::', 'ffff:ffff:ffff:ffff:ffff:ffff:ffff::')->negativeMask(), '0x0000000000000000000000000000ffff');
-        $this->assertEquals(IPv6::create('::0.0.0.0/126')->negativeMask(), '0x00000000000000000000000000000003');
+        $this->assertEquals(IPv6::create(0)->reverseMask(), 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff');
+        $this->assertEquals(IPv6::create('::0.0.0.0', 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff')->reverseMask(), 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff');
+        $this->assertEquals(IPv6::create('::', 'ffff:ffff:ffff:ffff:ffff:ffff::')->reverseMask(), '0000:0000:ffff:ffff:ffff:ffff:ffff:ffff');
+        $this->assertEquals(IPv6::create('::', 'ffff:ffff:ffff:ffff::')->reverseMask(), '0000:0000:0000:0000:ffff:ffff:ffff:ffff');
+        $this->assertEquals(IPv6::create('::', 'ffff:ffff::')->reverseMask(), '0000:0000:0000:0000:0000:0000:ffff:ffff');
+        $this->assertEquals(IPv6::create('::', 'ffff:ffff:ffff:ffff:ffff:ffff:ffff::')->reverseMask(), '0000:ffff:ffff:ffff:ffff:ffff:ffff:ffff');
+        $this->assertEquals(IPv6::create('::0.0.0.0/126')->reverseMask(), 'fffc:ffff:ffff:ffff:ffff:ffff:ffff:ffff');
 
-        $this->assertEquals(IPv6::create('::0.0.0.0', '0:ffff:0:0:f::')->negativeMask(), '0xffff0000fffffffffff0ffffffffffff');
+        $this->assertEquals(IPv6::create('::0.0.0.0', '0:ffff:0:0:f::')->reverseMask(), '0000:0000:0000:000f:0000:0000:ffff:0000');
 
         $this->expectException('InvalidArgumentException');
-        $this->assertEquals(IPv6::create('::0.0.0.0', 0)->negativeMask(), '0x00000000000000000000000000000000');
+        $this->assertEquals(IPv6::create('::0.0.0.0', 0)->reverseMask(), 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff');
     }
 
     public function testPrefixLength()
