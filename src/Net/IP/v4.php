@@ -151,7 +151,7 @@ class v4 extends BaseAddress
         $bitsCount = 0;
 
         for ($i=0; $i<$this->maxPrefixLength; $i++) {
-            $bitsCount += ($this->neg($this->mask) >> $i) & 1;
+            $bitsCount += ($this->not($this->mask) >> $i) & 1;
         }
 
         return $this->maxPrefixLength - $bitsCount;
@@ -180,9 +180,9 @@ class v4 extends BaseAddress
         if ($prefixLength === $this->maxPrefixLength) {
             return 1;
         } else if ($prefixLength === 0) {
-            return $this->neg($this->mask);
+            return $this->not($this->mask);
         } else {
-            return $this->neg($this->mask) + 1;
+            return $this->not($this->mask) + 1;
         }
     }
 
@@ -348,10 +348,10 @@ class v4 extends BaseAddress
      */
     private function internalLastAddr()
     {
-        return (($this->addr & $this->mask) + $this->neg($this->mask));
+        return (($this->addr & $this->mask) + $this->not($this->mask));
     }
 
-    private function neg($value)
+    private function not($value)
     {
         return (PHP_INT_SIZE == 8 ? (~$value) & 0x00000000FFFFFFFF : ~$value);
     }
