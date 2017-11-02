@@ -241,11 +241,15 @@ class v6 extends BaseAddress
      */
     public function full()
     {
-        $unpaddedHex = gmp_strval($this->addr, 16);
-        $solidFullHex = str_pad($unpaddedHex, 32, '0', STR_PAD_LEFT);
-        $groups = str_split($solidFullHex, 4);
+        return $this->internalFull($this->addr);
+    }
 
-        return implode(':', $groups);
+    /**
+     * @return string full textual mask
+     */
+    public function fullMask()
+    {
+        return $this->internalFull($this->mask);
     }
 
     /**
@@ -307,6 +311,19 @@ class v6 extends BaseAddress
         $compressed = preg_replace('/^:(\d+)/i', '::$1', $compressed, 1);
 
         return $compressed;
+    }
+
+    /**
+     * @param resource|\GMP
+     * @return string full textual address
+     */
+    private function internalFull($addr)
+    {
+        $unpaddedHex = gmp_strval($addr, 16);
+        $solidFullHex = str_pad($unpaddedHex, 32, '0', STR_PAD_LEFT);
+        $groups = str_split($solidFullHex, 4);
+
+        return implode(':', $groups);
     }
 
     /**

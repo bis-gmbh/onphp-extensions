@@ -50,7 +50,7 @@ class IPUtilsTest extends PHPUnit_Framework_TestCase
             'range' => '2a02:6b8:f:: - 2a02:6b8:f::ffff:ffff',
             'masklen' => 96,
             'hostbits' => 32,
-            'mask' => 'ffff:ffff:ffff:ffff:ffff:ffff::',
+            'mask' => 'ffff:ffff:ffff:ffff:ffff:ffff:0000:0000',
             'rmask' => '0000:0000:ffff:ffff:ffff:ffff:ffff:ffff',
             'addrs' => '4294967296',
             'hosts' => '4294967294',
