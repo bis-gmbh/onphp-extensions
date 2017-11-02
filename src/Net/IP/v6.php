@@ -10,6 +10,8 @@ namespace Onphp\Extensions\Net\IP;
 
 class v6 extends BaseAddress
 {
+    const REGEXP_PREFIX_LENGTH = '/^([0-9]|[1-9][0-9]|1[0-1][0-9]|1[0-9][0-8])$/i'; // 0-128
+
     public static $addressTypes = [ // rfc4291
         [
             'IPv6Notation' => '::/128',
@@ -47,26 +49,27 @@ class v6 extends BaseAddress
 
     public function assign($anyFormat, $maskString = null): Address
     {
-        if (Utils6::detectFormat($anyFormat) === 'numeric') {
+        if (self::isNumeric($anyFormat)) {
             if ($maskString !== null) {
                 throw new \InvalidArgumentException('Mask argument not allowed');
             }
             $this->addr = gmp_init($anyFormat);
-        } else if (Utils6::detectFormat($anyFormat) === 'textual') {
+        } else if (self::isTextual($anyFormat)) {
             if ($maskString !== null) {
-                if (Utils6::detectFormat($maskString) === 'textual') {
-                    $this->mask = gmp_init(self::toNumeric($maskString), 16);
+                if (self::isTextual($maskString)) {
+                    $this->mask = $this->fromTextual($maskString);
                 } else {
                     throw new \InvalidArgumentException('Mask argument must have textual format');
                 }
             }
-            $this->addr = gmp_init(self::toNumeric($anyFormat), 16);
-        } else if (Utils6::detectFormat($anyFormat) === 'cidr') {
+            $this->addr = $this->fromTextual($anyFormat);
+        } else if (self::isCIDR($anyFormat)) {
+            $cidrParts = explode('/', $anyFormat);
             if ($maskString !== null) {
                 throw new \InvalidArgumentException('Mask argument not allowed');
             }
-            $this->addr = $this->getNumericPrefixFromCIDR($anyFormat);
-            $this->mask = $this->getMaskBitsFromCIDR($anyFormat);
+            $this->addr = $this->fromTextual($cidrParts[0]);
+            $this->mask = $this->maskFromPrefixLength($cidrParts[1]);
         } else {
             throw new \InvalidArgumentException('Wrong arguments');
         }
@@ -75,45 +78,55 @@ class v6 extends BaseAddress
     }
 
     /**
-     * @param string $addr hexadecimal string address representation
-     * @return string
+     * @param mixed $value
+     * @return bool
      */
-    public static function toNumeric($addr)
+    public static function isNumeric($value)
     {
-        if (Utils6::isTextual($addr) === false) {
-            throw new \InvalidArgumentException('Wrong addr format');
-        }
-
-        return '0x' . current(unpack('H32', inet_pton($addr)));
+        return (
+            (is_string($value) || is_numeric($value))
+            && preg_match('/^(0|0x)?[0-9a-f]+$/i', $value)
+        );
     }
 
     /**
-     * @param int|string $addr numeric address
-     * @return string
+     * @param mixed $addr
+     * @return bool
      */
-    public static function toTextual($addr)
+    public static function isTextual($addr)
     {
-        if (Utils6::isNumeric($addr) === false) {
-            throw new \InvalidArgumentException('Wrong addr argument');
-        }
-
-        $hex = str_pad(gmp_strval(gmp_init($addr), 16), 32, '0', STR_PAD_LEFT);
-        $packed = hex2bin($hex);
-
-        return inet_ntop($packed);
+        return filter_var($addr, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) !== false;
     }
 
     /**
-     * @param int|string $addr numeric address
-     * @return string
+     * @param mixed $cidr
+     * @return bool
      */
-    public static function toBinaryString($addr)
+    public static function isCIDR($cidr)
     {
-        if (Utils6::isNumeric($addr) === false) {
-            throw new \InvalidArgumentException('Wrong addr argument');
+        if (false === is_string($cidr)) {
+            return false;
         }
 
-        return '0b' . str_pad(decbin(gmp_strval(gmp_init($addr), 10)), 128, '0', STR_PAD_LEFT);
+        $cidrParts = explode('/', $cidr);
+
+        if (
+            count($cidrParts) === 2
+            && self::isTextual($cidrParts[0])
+            && preg_match(self::REGEXP_PREFIX_LENGTH, $cidrParts[1])
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return string
+     */
+    public function binary()
+    {
+        return '0b' . str_pad(decbin(gmp_strval($this->addr, 10)), 128, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -156,7 +169,7 @@ class v6 extends BaseAddress
      */
     public function first()
     {
-        return new self(gmp_strval(gmp_and($this->addr, $this->mask), 10));
+        return new self(gmp_strval($this->internalFirstAddr(), 10));
     }
 
     /**
@@ -164,7 +177,7 @@ class v6 extends BaseAddress
      */
     public function last()
     {
-        return new self(gmp_strval(gmp_add(gmp_and($this->addr, $this->mask), $this->gmp_not($this->mask)), 10));
+        return new self(gmp_strval($this->internalLastAddr(), 10));
     }
 
     /**
@@ -209,22 +222,22 @@ class v6 extends BaseAddress
 
     public function addr()
     {
-        return self::toTextual($this->numeric());
+        return $this->toTextual($this->addr);
     }
 
     public function mask()
     {
-        return self::toTextual($this->netmask());
+        return $this->toTextual($this->mask);
     }
 
     public function cidr()
     {
-        return self::toTextual($this->numeric()) . '/' . $this->prefixLength();
+        return sprintf('%s/%d', $this->toTextual($this->addr), $this->prefixLength());
     }
 
     public function range()
     {
-        return self::toTextual($this->first()->numeric()) . ' - ' . self::toTextual($this->last()->numeric());
+        return $this->toTextual($this->internalFirstAddr()) . ' - ' . self::toTextual($this->internalLastAddr());
     }
 
     public function reverse()
@@ -385,38 +398,59 @@ class v6 extends BaseAddress
     }
 
     /**
-     * @param $cidr
-     * @return string
+     * @param string $addr
+     * @return resource|\GMP
      */
-    private function getNumericPrefixFromCIDR($cidr)
+    private function fromTextual($addr)
     {
-        if (Utils6::isCIDR($cidr) === false) {
-            throw new \InvalidArgumentException('Wrong cidr format');
+        if (self::isTextual($addr) === false) {
+            throw new \InvalidArgumentException('Wrong addr format');
         }
 
-        $cidrParts = explode('/', $cidr);
-
-        return self::toNumeric($cidrParts[0]);
+        return gmp_init(current(unpack('H32', inet_pton($addr))), 16);
     }
 
     /**
-     * @param $cidr
+     * @param resource|\GMP $addr internal address value
+     * @return string
+     */
+    private function toTextual($addr)
+    {
+        $hex = str_pad(gmp_strval($addr, 16), 32, '0', STR_PAD_LEFT);
+        $packed = hex2bin($hex);
+
+        return inet_ntop($packed);
+    }
+
+    /**
+     * @param $prefixLength
      * @return resource|object
      */
-    private function getMaskBitsFromCIDR($cidr)
+    private function maskFromPrefixLength($prefixLength)
     {
-        if (Utils6::isCIDR($cidr) === false) {
-            throw new \InvalidArgumentException('Wrong cidr format');
-        }
-
-        $cidrParts = explode('/', $cidr);
-
-        $mask = gmp_init('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF');
-        for ($i=0; $i<($this->maxPrefixLength - $cidrParts[1]); $i++) {
-            gmp_clrbit($mask, $i);
-        }
+        for (
+            $i = 0, $mask = gmp_init('0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF');
+            $i < ($this->maxPrefixLength - $prefixLength);
+            gmp_clrbit($mask, $i), $i++
+        );
 
         return $mask;
+    }
+
+    /**
+     * @return resource|\GMP
+     */
+    private function internalFirstAddr()
+    {
+        return gmp_and($this->addr, $this->mask);
+    }
+
+    /**
+     * @return resource|\GMP
+     */
+    private function internalLastAddr()
+    {
+        return gmp_add(gmp_and($this->addr, $this->mask), $this->gmp_not($this->mask));
     }
 
     /**

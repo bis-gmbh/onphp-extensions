@@ -17,6 +17,45 @@ class IPv6Test extends PHPUnit_Framework_TestCase
         $this->invalidTextualAddresses = require 'data/ipv6-invalid.php';
     }
 
+    public function testIsNumeric()
+    {
+        $this->assertFalse(IPv6::isNumeric(null));
+        $this->assertFalse(IPv6::isNumeric(false));
+        $this->assertFalse(IPv6::isNumeric(true));
+        $this->assertFalse(IPv6::isNumeric('127.0.0.1'));
+        $this->assertFalse(IPv6::isNumeric(-1));
+        $this->assertTrue(IPv6::isNumeric(0));
+        $this->assertTrue(IPv6::isNumeric(4294967296));
+    }
+
+    public function testIsTextual()
+    {
+        foreach ($this->invalidTextualAddresses as $invalidAddr) {
+            $this->assertFalse(IPv6::isTextual($invalidAddr));
+        }
+        $this->assertTrue(IPv6::isTextual('1111:2222::5555:6666:7777:8888'));
+        $this->assertTrue(IPv6::isTextual('0:0:0:0:0:FFFF:129.144.52.38'));
+        $this->assertTrue(IPv6::isTextual('0:1:2:3:4:5:6:7'));
+        $this->assertTrue(IPv6::isTextual('1111:2222::'));
+        $this->assertTrue(IPv6::isTextual('::ffff:2.3.4.0'));
+        $this->assertTrue(IPv6::isTextual('a:aaaa::'));
+        $this->assertTrue(IPv6::isTextual('a::f'));
+    }
+
+    public function testIsCIDR()
+    {
+        foreach ($this->invalidTextualAddresses as $invalidAddr) {
+            $this->assertFalse(IPv6::isCIDR($invalidAddr));
+        }
+        $this->assertTrue(IPv6::isCIDR('1111:2222::5555:6666:7777:8888/0'));
+        $this->assertTrue(IPv6::isCIDR('0:0:0:0:0:FFFF:129.144.52.38/64'));
+        $this->assertTrue(IPv6::isCIDR('0:1:2:3:4:5:6:7/128'));
+        $this->assertTrue(IPv6::isCIDR('1111:2222::/74'));
+        $this->assertTrue(IPv6::isCIDR('::ffff:2.3.4.0/109'));
+        $this->assertTrue(IPv6::isCIDR('a:aaaa::/4'));
+        $this->assertTrue(IPv6::isCIDR('a::f/117'));
+    }
+
     public function testAssign()
     {
         $ip = new IPv6;
@@ -32,35 +71,13 @@ class IPv6Test extends PHPUnit_Framework_TestCase
         $ip->assign('240/4', '255');
     }
 
-    public function testToNumeric()
+    public function testBinary()
     {
-        $this->assertEquals(IPv6::toNumeric('::'), '0x00000000000000000000000000000000');
-        $this->assertEquals(IPv6::toNumeric('::127.0.0.1'), '0x0000000000000000000000007f000001');
-        $this->assertEquals(IPv6::toNumeric('::255.255.255.255'), '0x000000000000000000000000ffffffff');
-        $this->assertEquals(IPv6::toNumeric('ffff::'), '0xffff0000000000000000000000000000');
-
-        $this->expectException('InvalidArgumentException');
-        $this->assertEquals(IPv6::toNumeric(''), '0');
-        $this->assertEquals(IPv6::toNumeric('127.0.0.1/8'), '2130706433');
-    }
-
-    public function testToTextual()
-    {
-        $this->assertEquals(IPv6::toTextual(3325256815), '::198.51.100.111');
-        $this->assertEquals(IPv6::toTextual(0), '::');
-        $this->assertEquals(IPv6::toTextual('4294967295'), '::255.255.255.255');
-
-        $this->expectException('InvalidArgumentException');
-        $this->assertEquals(IPv6::toTextual(new \StdClass), '255.255.255.255');
-    }
-
-    public function testToBinaryString()
-    {
-        $this->assertEquals(IPv6::toBinaryString(0), "0b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
-        $this->assertEquals(IPv6::toBinaryString(3325256815), '0b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011000110001100110110010001101111');
-        $this->assertNotEquals(IPv6::toBinaryString(3325256815), '0b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000110001100110110010001101111');
-        $this->assertEquals(IPv6::toBinaryString('4294967295'), '0b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111111111');
-        $this->assertNotEquals(IPv6::toBinaryString(4294967294), '0b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111111111');
+        $this->assertEquals(IPv6::create(0)->binary(), "0b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000");
+        $this->assertEquals(IPv6::create(3325256815)->binary(), '0b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011000110001100110110010001101111');
+        $this->assertNotEquals(IPv6::create(3325256815)->binary(), '0b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000110001100110110010001101111');
+        $this->assertEquals(IPv6::create('4294967295')->binary(), '0b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111111111');
+        $this->assertNotEquals(IPv6::create(4294967294)->binary(), '0b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111111111');
     }
 
     public function testNumeric()
