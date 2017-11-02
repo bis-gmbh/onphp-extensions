@@ -47,7 +47,7 @@ class v6 extends BaseAddress
         }
     }
 
-    public function assign($anyFormat, $maskString = null): Address
+    public function assign($anyFormat, $maskString = null)
     {
         if (self::isNumeric($anyFormat)) {
             if ($maskString !== null) {
