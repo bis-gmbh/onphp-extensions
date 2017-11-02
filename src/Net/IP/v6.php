@@ -96,7 +96,7 @@ class v6 extends BaseAddress
      */
     public function binary()
     {
-        return '0b' . str_pad(decbin(gmp_strval($this->addr, 10)), 128, '0', STR_PAD_LEFT);
+        return '0b' . str_pad(gmp_strval($this->addr, 2), 128, '0', STR_PAD_LEFT);
     }
 
     public function decimal()
