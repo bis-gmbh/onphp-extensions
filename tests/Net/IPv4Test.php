@@ -10,6 +10,13 @@ use \Onphp\Extensions\Net\IP\v4 as IPv4;
 
 class IPv4Test extends PHPUnit_Framework_TestCase
 {
+    public $invalidStringAddresses = [];
+
+    public function setup()
+    {
+        $this->invalidStringAddresses = require 'data/ipv4-invalid.php';
+    }
+
     public function testAssign()
     {
         $ip = new IPv4;
@@ -23,6 +30,59 @@ class IPv4Test extends PHPUnit_Framework_TestCase
         $ip->assign(-1);
         $ip->assign('192.168.0.1', 0xFFFFFF00);
         $ip->assign('240/4', '255');
+    }
+
+    public function testIsNumeric()
+    {
+        $this->assertFalse(IPv4::isNumeric(null));
+        $this->assertFalse(IPv4::isNumeric(false));
+        $this->assertFalse(IPv4::isNumeric(true));
+        $this->assertFalse(IPv4::isNumeric('127.0.0.1'));
+        $this->assertFalse(IPv4::isNumeric(-1));
+        $this->assertFalse(IPv4::isNumeric(4294967296));
+        $this->assertTrue(IPv4::isNumeric(0));
+        $this->assertTrue(IPv4::isNumeric(2130706433));
+    }
+
+    public function testIsTextual()
+    {
+        foreach ($this->invalidStringAddresses as $invalidAddr) {
+            $this->assertFalse(IPv4::isTextual($invalidAddr));
+        }
+        $this->assertTrue(IPv4::isTextual('0.0.0.0'));
+        $this->assertTrue(IPv4::isTextual('127.0.0.1'));
+        $this->assertTrue(IPv4::isTextual('10.0.100.1'));
+        $this->assertTrue(IPv4::isTextual('224.1.0.0'));
+        $this->assertTrue(IPv4::isTextual('255.255.255.255'));
+        $this->assertTrue(IPv4::isTextual('169.255.255'));
+        $this->assertTrue(IPv4::isTextual('169.255'));
+        $this->assertTrue(IPv4::isTextual('169'));
+    }
+
+    public function testIsCIDR()
+    {
+        foreach ($this->invalidStringAddresses as $invalidAddr) {
+            $this->assertFalse(IPv4::isCIDR($invalidAddr));
+        }
+        $this->assertTrue(IPv4::isCIDR('0.0.0.0/0'));
+        $this->assertTrue(IPv4::isCIDR('192.168.100.2/30'));
+        $this->assertTrue(IPv4::isCIDR('192.168.100/24'));
+        $this->assertTrue(IPv4::isCIDR('192.168/16'));
+        $this->assertTrue(IPv4::isCIDR('10/8'));
+        $this->assertTrue(IPv4::isCIDR('255.255.255.255/32'));
+    }
+
+    public function testBinary()
+    {
+        $this->assertEquals(IPv4::create(0)->binary(), '0b00000000000000000000000000000000');
+        $this->assertEquals(IPv4::create(3325256815)->binary(), '0b11000110001100110110010001101111');
+        $this->assertNotEquals(IPv4::create(3325256815)->binary(), '0b01000110001100110110010001101111');
+        $this->assertEquals(IPv4::create(4294967295)->binary(), '0b11111111111111111111111111111111');
+        $this->assertNotEquals(IPv4::create(4294967294)->binary(), '0b11111111111111111111111111111111');
+
+        $this->expectException('InvalidArgumentException');
+        $this->assertEquals(IPv4::create(-1)->binary(), '');
+        $this->assertEquals(IPv4::create(4294967296)->binary(), '');
     }
 
     public function testNumeric()
