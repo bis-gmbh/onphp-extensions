@@ -69,7 +69,7 @@ class Utils
         }
 
         if ($addr instanceof v6) {
-            $data['net']['fist'] = $addr->first()->hexadecimal();
+            $data['net']['first'] = $addr->first()->hexadecimal();
             $data['net']['last'] = $addr->last()->hexadecimal();
         }
 

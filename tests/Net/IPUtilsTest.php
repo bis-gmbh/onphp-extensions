@@ -54,7 +54,7 @@ class IPUtilsTest extends PHPUnit_Framework_TestCase
             'rmask' => '0000:0000:ffff:ffff:ffff:ffff:ffff:ffff',
             'addrs' => '4294967296',
             'hosts' => '4294967294',
-            'fist' => '0x2a0206b8000f00000000000000000000',
+            'first' => '0x2a0206b8000f00000000000000000000',
             'last' => '0x2a0206b8000f000000000000ffffffff',
         ],
     ];
