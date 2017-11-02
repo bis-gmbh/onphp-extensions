@@ -64,12 +64,12 @@ class v6 extends BaseAddress
             }
             $this->addr = $this->fromTextual($anyFormat);
         } else if (self::isCIDR($anyFormat)) {
-            $cidrParts = explode('/', $anyFormat);
             if ($maskString !== null) {
                 throw new \InvalidArgumentException('Mask argument not allowed');
             }
+            $cidrParts = explode('/', $anyFormat);
             $this->addr = $this->fromTextual($cidrParts[0]);
-            $this->mask = $this->maskFromPrefixLength($cidrParts[1]);
+            $this->mask = $this->maskFromPrefixLength(intval($cidrParts[1]));
         } else {
             throw new \InvalidArgumentException('Wrong arguments');
         }
@@ -423,7 +423,7 @@ class v6 extends BaseAddress
     }
 
     /**
-     * @param $prefixLength
+     * @param int $prefixLength
      * @return resource|object
      */
     private function maskFromPrefixLength($prefixLength)
