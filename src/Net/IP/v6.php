@@ -439,11 +439,11 @@ class v6 extends BaseAddress
     private function gmp_not($value)
     {
         for (
-            $i = 0;
+            $i = 0, $notValue = gmp_init(0);
             $i < $this->maxPrefixLength;
-            gmp_testbit($value, $i) ? gmp_clrbit($value, $i) : gmp_setbit($value, $i), $i++
+            gmp_testbit($value, $i) ? gmp_clrbit($notValue, $i) : gmp_setbit($notValue, $i), $i++
         );
 
-        return $value;
+        return $notValue;
     }
 }
