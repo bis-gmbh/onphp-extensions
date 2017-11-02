@@ -99,10 +99,12 @@ class v6 extends BaseAddress
         return '0b' . str_pad(decbin(gmp_strval($this->addr, 10)), 128, '0', STR_PAD_LEFT);
     }
 
-    /**
-     * @return string hexadecimal address representation
-     */
-    public function numeric()
+    public function decimal()
+    {
+        return gmp_strval($this->addr, 10);
+    }
+
+    public function hexadecimal()
     {
         return '0x' . str_pad(gmp_strval($this->addr, 16), 32, '0', STR_PAD_LEFT);
     }
@@ -178,14 +180,14 @@ class v6 extends BaseAddress
 
     public function ltEq(Address $addr)
     {
-        $beginScopeCmp = gmp_cmp($this->addr, gmp_init($addr->numeric()));
+        $beginScopeCmp = gmp_cmp($this->addr, gmp_init($addr->decimal()));
 
         return $beginScopeCmp === 0 || $beginScopeCmp < 0;
     }
 
     public function gtEq(Address $addr)
     {
-        $endScopeCmp = gmp_cmp($this->addr, gmp_init($addr->numeric()));
+        $endScopeCmp = gmp_cmp($this->addr, gmp_init($addr->decimal()));
 
         return $endScopeCmp === 0 || $endScopeCmp > 0;
     }

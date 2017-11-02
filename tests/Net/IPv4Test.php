@@ -85,13 +85,22 @@ class IPv4Test extends PHPUnit_Framework_TestCase
         $this->assertEquals(IPv4::create(4294967296)->binary(), '');
     }
 
-    public function testNumeric()
+    public function testDecimal()
     {
-        $this->assertEquals(IPv4::create(0)->numeric(), 0);
-        $this->assertEquals(IPv4::create(0xFFFFFFFF)->numeric(), 0xFFFFFFFF);
-        $this->assertEquals(IPv4::create('0.0.0.0')->numeric(), 0);
-        $this->assertEquals(IPv4::create('255.255.255.255')->numeric(), 0xFFFFFFFF);
-        $this->assertEquals(IPv4::create('127.0.0.1')->numeric(), 2130706433);
+        $this->assertEquals(IPv4::create(0)->decimal(), 0);
+        $this->assertEquals(IPv4::create(0xFFFFFFFF)->decimal(), 4294967295);
+        $this->assertEquals(IPv4::create('0.0.0.0')->decimal(), 0);
+        $this->assertEquals(IPv4::create('255.255.255.255')->decimal(), 4294967295);
+        $this->assertEquals(IPv4::create('127.0.0.1')->decimal(), 2130706433);
+    }
+
+    public function testHexaecimal()
+    {
+        $this->assertEquals(IPv4::create(0)->hexadecimal(), '0x00000000');
+        $this->assertEquals(IPv4::create(0xFFFFFFFF)->hexadecimal(), '0xffffffff');
+        $this->assertEquals(IPv4::create('0.0.0.0')->hexadecimal(), '0x00000000');
+        $this->assertEquals(IPv4::create('255.255.255.255')->hexadecimal(), '0xffffffff');
+        $this->assertEquals(IPv4::create('127.0.0.1')->hexadecimal(), '0x7f000001');
     }
 
     public function testNetmask()
@@ -142,20 +151,20 @@ class IPv4Test extends PHPUnit_Framework_TestCase
 
     public function testFirst()
     {
-        $this->assertEquals(IPv4::create('0/0')->first()->numeric(), 0);
-        $this->assertEquals(IPv4::create('255.255.255.255/32')->first()->numeric(), 0xFFFFFFFF);
-        $this->assertEquals(IPv4::create('192.168/16')->first()->numeric(), 3232235520); // 192.168.0.0
-        $this->assertEquals(IPv4::create('192.168.100.15/30')->first()->numeric(), 3232261132); // 192.168.100.12
-        $this->assertEquals(IPv4::create('192.168.100.15/4')->first()->numeric(), 3221225472); // 192.0.0.0
+        $this->assertEquals(IPv4::create('0/0')->first()->decimal(), 0);
+        $this->assertEquals(IPv4::create('255.255.255.255/32')->first()->decimal(), 4294967295);
+        $this->assertEquals(IPv4::create('192.168/16')->first()->decimal(), 3232235520); // 192.168.0.0
+        $this->assertEquals(IPv4::create('192.168.100.15/30')->first()->decimal(), 3232261132); // 192.168.100.12
+        $this->assertEquals(IPv4::create('192.168.100.15/4')->first()->decimal(), 3221225472); // 192.0.0.0
     }
 
     public function testLast()
     {
-        $this->assertEquals(IPv4::create('0/0')->last()->numeric(), 0xFFFFFFFF);
-        $this->assertEquals(IPv4::create('255.255.255.255/32')->last()->numeric(), 0xFFFFFFFF);
-        $this->assertEquals(IPv4::create('192.168/16')->last()->numeric(), 3232301055); // 192.168.255.255
-        $this->assertEquals(IPv4::create('192.168.100.15/30')->last()->numeric(), 3232261135); // 192.168.100.15
-        $this->assertEquals(IPv4::create('192.168.100.15/4')->last()->numeric(), 3489660927); // 207.255.255.255
+        $this->assertEquals(IPv4::create('0/0')->last()->decimal(), 4294967295);
+        $this->assertEquals(IPv4::create('255.255.255.255/32')->last()->decimal(), 4294967295);
+        $this->assertEquals(IPv4::create('192.168/16')->last()->decimal(), 3232301055); // 192.168.255.255
+        $this->assertEquals(IPv4::create('192.168.100.15/30')->last()->decimal(), 3232261135); // 192.168.100.15
+        $this->assertEquals(IPv4::create('192.168.100.15/4')->last()->decimal(), 3489660927); // 207.255.255.255
     }
 
     public function testNumAddrs()

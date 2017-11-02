@@ -80,15 +80,26 @@ class IPv6Test extends PHPUnit_Framework_TestCase
         $this->assertNotEquals(IPv6::create(4294967294)->binary(), '0b00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111111111');
     }
 
-    public function testNumeric()
+    public function testDecimal()
     {
-        $this->assertEquals(IPv6::create(0)->numeric(), '0x00000000000000000000000000000000');
-        $this->assertEquals(IPv6::create(0xFFFFFFFF)->numeric(), '0x000000000000000000000000ffffffff');
-        $this->assertEquals(IPv6::create('::0.0.0.0')->numeric(), '0x00000000000000000000000000000000');
-        $this->assertEquals(IPv6::create('::255.255.255.255')->numeric(), '0x000000000000000000000000ffffffff');
-        $this->assertEquals(IPv6::create('::127.0.0.1')->numeric(), '0x0000000000000000000000007f000001');
-        $this->assertEquals(IPv6::create('0:ffff::')->numeric(), '0x0000ffff000000000000000000000000');
-        $this->assertEquals(IPv6::create('ffff::')->numeric(), '0xffff0000000000000000000000000000');
+        $this->assertEquals(IPv6::create(0)->decimal(), '0');
+        $this->assertEquals(IPv6::create(0xFFFFFFFF)->decimal(), '4294967295');
+        $this->assertEquals(IPv6::create('::0.0.0.0')->decimal(), '0');
+        $this->assertEquals(IPv6::create('::255.255.255.255')->decimal(), '4294967295');
+        $this->assertEquals(IPv6::create('::127.0.0.1')->decimal(), '2130706433');
+        $this->assertEquals(IPv6::create('0:ffff::')->decimal(), '5192217630372313364192902785269760');
+        $this->assertEquals(IPv6::create('ffff::')->decimal(), '340277174624079928635746076935438991360');
+    }
+
+    public function testHexadecimal()
+    {
+        $this->assertEquals(IPv6::create(0)->hexadecimal(), '0x00000000000000000000000000000000');
+        $this->assertEquals(IPv6::create(0xFFFFFFFF)->hexadecimal(), '0x000000000000000000000000ffffffff');
+        $this->assertEquals(IPv6::create('::0.0.0.0')->hexadecimal(), '0x00000000000000000000000000000000');
+        $this->assertEquals(IPv6::create('::255.255.255.255')->hexadecimal(), '0x000000000000000000000000ffffffff');
+        $this->assertEquals(IPv6::create('::127.0.0.1')->hexadecimal(), '0x0000000000000000000000007f000001');
+        $this->assertEquals(IPv6::create('0:ffff::')->hexadecimal(), '0x0000ffff000000000000000000000000');
+        $this->assertEquals(IPv6::create('ffff::')->hexadecimal(), '0xffff0000000000000000000000000000');
     }
 
     public function testNetmask()
@@ -140,20 +151,20 @@ class IPv6Test extends PHPUnit_Framework_TestCase
 
     public function testFirst()
     {
-        $this->assertEquals(IPv6::create('::/0')->first()->numeric(), '0x00000000000000000000000000000000');
-        $this->assertEquals(IPv6::create('ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128')->first()->numeric(), '0xffffffffffffffffffffffffffffffff');
-        $this->assertEquals(IPv6::create('ffff:ffff:ffff:ffff::/64')->first()->numeric(), '0xffffffffffffffff0000000000000000');
-        $this->assertEquals(IPv6::create('2a02:6b8::2:242/30')->first()->numeric(), '0x2a0206b8000000000000000000000000');
-        $this->assertEquals(IPv6::create('2a00:1450:4010:c0f::64/4')->first()->numeric(), '0x20000000000000000000000000000000');
+        $this->assertEquals(IPv6::create('::/0')->first()->hexadecimal(), '0x00000000000000000000000000000000');
+        $this->assertEquals(IPv6::create('ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128')->first()->hexadecimal(), '0xffffffffffffffffffffffffffffffff');
+        $this->assertEquals(IPv6::create('ffff:ffff:ffff:ffff::/64')->first()->hexadecimal(), '0xffffffffffffffff0000000000000000');
+        $this->assertEquals(IPv6::create('2a02:6b8::2:242/30')->first()->hexadecimal(), '0x2a0206b8000000000000000000000000');
+        $this->assertEquals(IPv6::create('2a00:1450:4010:c0f::64/4')->first()->hexadecimal(), '0x20000000000000000000000000000000');
     }
 
     public function testLast()
     {
-        $this->assertEquals(IPv6::create('::/0')->last()->numeric(), '0xffffffffffffffffffffffffffffffff');
-        $this->assertEquals(IPv6::create('ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128')->last()->numeric(), '0xffffffffffffffffffffffffffffffff');
-        $this->assertEquals(IPv6::create('ffff:ffff:ffff:ffff::/64')->last()->numeric(), '0xffffffffffffffffffffffffffffffff');
-        $this->assertEquals(IPv6::create('2a02:6b8::2:242/30')->last()->numeric(), '0x2a0206bbffffffffffffffffffffffff');
-        $this->assertEquals(IPv6::create('2a00:1450:4010:c0f::64/4')->last()->numeric(), '0x2fffffffffffffffffffffffffffffff');
+        $this->assertEquals(IPv6::create('::/0')->last()->hexadecimal(), '0xffffffffffffffffffffffffffffffff');
+        $this->assertEquals(IPv6::create('ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/128')->last()->hexadecimal(), '0xffffffffffffffffffffffffffffffff');
+        $this->assertEquals(IPv6::create('ffff:ffff:ffff:ffff::/64')->last()->hexadecimal(), '0xffffffffffffffffffffffffffffffff');
+        $this->assertEquals(IPv6::create('2a02:6b8::2:242/30')->last()->hexadecimal(), '0x2a0206bbffffffffffffffffffffffff');
+        $this->assertEquals(IPv6::create('2a00:1450:4010:c0f::64/4')->last()->hexadecimal(), '0x2fffffffffffffffffffffffffffffff');
     }
 
     public function testNumAddrs()

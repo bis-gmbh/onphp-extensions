@@ -30,17 +30,22 @@ interface Address
     public function assign($anyFormat, $mask = null);
 
     /**
-     * @return mixed binary value
+     * @return string binary value
      */
     public function binary();
 
     /**
-     * @return mixed numeric value depend on ip version
+     * @return int|string numeric value depend on ip version
      */
-    public function numeric();
+    public function decimal();
 
     /**
-     * @return mixed numeric value depend on ip version
+     * @return string numeric value
+     */
+    public function hexadecimal();
+
+    /**
+     * @return string hexadecimal value
      */
     public function netmask();
 

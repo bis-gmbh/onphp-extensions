@@ -131,9 +131,14 @@ class v4 extends BaseAddress
         return '0b' . str_pad(decbin($this->addr), 32, '0', STR_PAD_LEFT);
     }
 
-    public function numeric()
+    public function decimal()
     {
         return $this->addr;
+    }
+
+    public function hexadecimal()
+    {
+        return '0x' . str_pad(dechex($this->addr), 8, '0', STR_PAD_LEFT);
     }
 
     public function netmask()
@@ -194,12 +199,12 @@ class v4 extends BaseAddress
 
     public function ltEq(Address $addr)
     {
-        return $this->addr <= $addr->numeric();
+        return $this->addr <= $addr->decimal();
     }
 
     public function gtEq(Address $addr)
     {
-        return $this->addr >= $addr->numeric();
+        return $this->addr >= $addr->decimal();
     }
 
     public function addr()
