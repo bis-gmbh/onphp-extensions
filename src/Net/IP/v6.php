@@ -145,7 +145,7 @@ class v6 extends BaseAddress
     }
 
     /**
-     * @return string decimal value
+     * @return string
      */
     public function numAddrs()
     {
@@ -156,18 +156,23 @@ class v6 extends BaseAddress
         } else if ($prefixLength === 0) {
             $num = $this->gmp_not($this->mask);
         } else {
-            $num = gmp_add($this->gmp_not($this->mask), 1);
+            $num = gmp_add($this->gmp_not($this->mask), gmp_init(1));
         }
         return gmp_strval($num, 10);
     }
 
     /**
-     * @return resource|string
+     * @return string
      */
     public function numHosts()
     {
         $num = gmp_init($this->numAddrs());
-        return (gmp_cmp($num, gmp_init(2)) > 0) ? gmp_strval(gmp_sub($num, gmp_init(2)), 10) : '1';
+
+        if (gmp_cmp($num, gmp_init(2)) > 0) {
+            return gmp_strval(gmp_sub($num, gmp_init(2)), 10);
+        }
+
+        return '1';
     }
 
     public function ltEq(Address $addr)

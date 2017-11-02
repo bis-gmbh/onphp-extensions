@@ -65,12 +65,12 @@ interface Address
     public function last();
 
     /**
-     * @return int
+     * @return int|string numeric value depend on ip version
      */
     public function numAddrs();
 
     /**
-     * @return int
+     * @return int|string numeric value depend on ip version
      */
     public function numHosts();
 
