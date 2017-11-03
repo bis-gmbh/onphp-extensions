@@ -115,11 +115,18 @@ abstract class BaseAddress implements Address
         return $value;
     }
 
-    public function hostBits(): int
+    /**
+     * @return int
+     */
+    public function hostBits()
     {
         return $this->maxPrefixLength - $this->prefixLength();
     }
 
+    /**
+     * @param array|Address $scope
+     * @return bool
+     */
     public function contains($scope)
     {
         if (is_array($scope)) {
@@ -142,6 +149,10 @@ abstract class BaseAddress implements Address
         return false;
     }
 
+    /**
+     * @param Address $addr
+     * @return bool
+     */
     public function within(Address $addr)
     {
         return $addr->first()->gtEq($this->first()) && $addr->last()->ltEq($this->last());
