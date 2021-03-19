@@ -12,8 +12,7 @@
   ],
   "require": {
     "php": ">=5.4.0",
-    "bis-gmbh/onphp": "^2.0.0",
-    "facebook/graph-sdk": "*"
+    "bis-gmbh/onphp": "^2.0.0"
   },
   "require-dev": {
     "phpunit/phpunit": "5.2.*"
