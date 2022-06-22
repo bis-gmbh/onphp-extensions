@@ -48,9 +48,9 @@ class Pbkdf2
 	 * @param int $iterationCount Optional. The number of times to run operation (i.e. > 10000 times)
 	 * @return bool Matches.
 	 */
-	public static function isMatch($password, $hash, $salt, $iterationCount = self::HASH_ITERATIONS, $secret)
+	public static function isMatch($password, $hash, $salt, $secret, $iterationCount = self::HASH_ITERATIONS)
 	{
-		$hashExpected = self::hash($password, $salt, $iterationCount, $secret);
+		$hashExpected = self::hash($password, $salt, $secret, $iterationCount);
 
 		return $hashExpected === $hash;
 	}
@@ -65,7 +65,7 @@ class Pbkdf2
 	 * @param string $secret Optional. A secret, known only to the application. This helps to add entropy.
 	 * @return string
 	 */
-	public static function hash($password, $salt, $iterationCount = self::HASH_ITERATIONS, $secret)
+	public static function hash($password, $salt, $secret, $iterationCount = self::HASH_ITERATIONS)
 	{
 		$hash = $password;
 

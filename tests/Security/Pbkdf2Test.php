@@ -28,8 +28,8 @@ class Pbkdf2Test extends PHPUnit_Framework_TestCase
             self::PASSWORD,
             'd6c71a7d24bf0fb232f0d1404e25136e',
             self::SALT,
-            self::ITERATIONS,
-            self::SECRET
+            self::SECRET,
+            self::ITERATIONS
         );
 
         $this->assertEquals(true, $isMatch);
@@ -37,7 +37,7 @@ class Pbkdf2Test extends PHPUnit_Framework_TestCase
 
     public function testHash()
     {
-        $hash = Pbkdf2::hash(self::PASSWORD, self::SALT, self::ITERATIONS, self::SECRET);
+        $hash = Pbkdf2::hash(self::PASSWORD, self::SALT, self::SECRET, self::ITERATIONS);
 
         $this->assertEquals('d6c71a7d24bf0fb232f0d1404e25136e', $hash);
     }
