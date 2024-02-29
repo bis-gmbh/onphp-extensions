@@ -81,7 +81,7 @@ class DNS
         fclose($handle);
 
         $rawData = substr($response, $requestsize + 2);
-        if ($rawData === false) {
+        if ($rawData === false || mb_strlen($rawData) === 0) {
             return $ip;
         }
 
